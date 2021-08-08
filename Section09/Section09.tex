@@ -1,0 +1,264 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{AWS Fundamentals: RDS + Aurora + ElastiCache}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{RDS}
+\begin{itemize}
+	\item Relational Database Service
+	\item Managed DB service for DBs that use SQL
+	\item Postgres, MySQL, MariaDB, Oracle, Microsoft SQL
+	\item Using RDS vs deploying DB on EC2
+	\begin{itemize}
+		\item Managed service: automated provisioning, OS patching
+		\item Continous Backups
+		\item Monitoring dashboards
+		\item Read replicas
+		\item Multi AZ setup for DR
+		\item Scaling capability
+		\item storage backed by EBS
+		\item Cannot SSH into your instances
+	\end{itemize}
+	\item RDS Backups
+	\begin{itemize}
+		\item Backups are automatically enabled in RDS
+		\item Automated Backups: daily full backup, transaction logs, 7 days retention
+	\end{itemize}
+\end{itemize}
+
+\subsection{Storage Auto Scaling}
+\begin{itemize}
+	\item Helps increase storage on RDS DB instance dynamically
+	\item If RDS detects you are running out of free DB storage, it scales automatically
+	\item Useful for apps with unpredictable workloads
+	\item Supports all RDS DB engines
+\end{itemize}
+
+\subsection{Read replicas vs Multi AZ}
+\begin{itemize}
+	\item Read Replicas for read stability
+	\begin{itemize}
+		\item Up to 5 read replicas
+		\item Within AZ, Cross AZ, or Cross Region
+		\item is Async, so reads are eventually consistent
+		\item Replicas can be promoted to their own DB
+		\item Applications must update the connection string to leverage read replicas
+	\end{itemize}
+	\item RR Use case
+	\begin{itemize}
+		\item Prod DB taking on normal load
+		\item You want to run a reporting application to run some analytics
+		\item Create RR to run the new workload there
+		\item Prod DB is unaffected
+		\item RR are used for SELECT type kind of statements (no INSERT/UPDATE etc)
+	\end{itemize}
+	\item RR Network Cost
+	\begin{itemize}
+		\item There's a network cost when data goes from one AZ to another
+		\item For RDS read replicas within the same region, you don't pay that fee
+		\item ASYNC replication: For example, if your application reads from the RR before they had the chance to to replicate the data then you may get all the data. Called $\textit{eventually consistent asynchronous replication}$
+	\end{itemize}
+	\item RDS Multi AZ (Disaster Recovery)
+	\begin{itemize}
+		\item SYNC replication
+		\item EX: RDS DB in AZ A and RDS DB standby in AZ B
+		\item When your application writes to the master, that change needs to be replicated to the standby to be accepted
+		\item One DNS name
+		\item If there is a problem with master, automatic failover to standby
+		\item that standby will get promoted to master
+		\item Not used for scaling
+		\item Useful for disaster recovery
+	\end{itemize}
+	\item RDS from Single AZ to Multi AZ
+	\begin{itemize}
+		\item Zero downtime operation
+		\item click on modify for DB, enable multi AZ
+		\item What happens internally
+		\begin{itemize}
+			\item A snapshot is taken
+			\item New DB is restored from the snapshot in a new AZ
+			\item Synchronization is established between the two databases
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsection{Encryption and Security}
+\begin{itemize}
+	\item At rest encryption: data not in movement
+	\begin{itemize}
+		\item Encrypt master and RR with AWS KMS (key management services)
+		\item Must be defined at launch time
+		\item If the master is not encrypted, neither can the RRs
+	\end{itemize}
+	\item In flight encryption
+	\begin{itemize}
+		\item SSL certificates to encrypt data to RDS in flight
+		\item Provide SSL options with trust certificate when connecting to DB
+	\end{itemize}
+	\item Encryption Operations
+	\begin{itemize}
+		\item Snapshots of encrypted RDS DBs are encrypted and vice-versa
+		\item Can copy a snapshot into an encrypted one
+		\item To encrypt an un-encrypted DB
+		\begin{itemize}
+			\item Create snapshot of the un-encrypted DB
+			\item Copy the snapshot and enable encryption for the snapshot
+			\item Restore the DB from the encrypted snapshot
+			\item Migrate applications to the new DB and delete the old one
+		\end{itemize}
+		\item RDS DBs are deployed within private subnet
+		\item Security works by leveraging security groups
+		\item Access mgt handled with IAM policies, username/password
+		\item RDS IAM authentication
+		\begin{itemize}
+			\item works with mysql and postgres
+			\item Don't need a password, just an authentication token obtained through IAM and RDS API calls
+			\item Token has lifetime of 15 mins
+			\item Easier to centrally manage users/roles with IAM
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\section{Aurora}
+\begin{itemize}
+	\item Proprietary technology from AWS
+	\item Postgres and MySQL are supported
+	\item "Cloud optimized" - better performance than RDS
+	\item Storage grows in 10 gb increments
+	\item Failover is instantaneous. High Availability
+\end{itemize}
+
+\subsection{High Availability and Read Scaling}
+\begin{itemize}
+	\item 6 copies of data across 3 AZ (4 needed for writes, 3 for reads)
+	\item Self healing, striped storage
+	\item One Aurora instance takes writes
+	\item Automated failover very quick
+	\item One master and up to 15 RRs
+	\item Support for Cross Region Replication
+\end{itemize}
+
+\subsection{DB Cluster}
+\begin{itemize}
+	\item Master writes to shared storage volume (which expands)
+	\item Writer endpoint always points to master, useful if autofailing. It's a DNS name
+	\item Even if master fails, the clients can talk to the writer endpoint and is automatically redirected to the right instance
+	\item Can set up autoscaling on your RRs
+	\item Reader endpoint - helps with connection load balancing, connects to all your RRs
+	\item Backtrack: restore data at any point without using backups
+	\item Usually pick either: one writer with multiple readers or serverless (expand/contract based on demand)
+	\item Writers and readers are separate
+	\item You should either select the writer endpoint to write or a reader endpoint to read
+\end{itemize}
+
+\subsection{Security}
+\begin{itemize}
+	\item Encryption at rest with KMS
+	\item In-flight with SSL
+	\item Pretty much the same as RDS
+\end{itemize}
+
+\subsection{Advanced Concepts}
+\begin{itemize}
+	\item Replica autoscaling
+	\begin{itemize}
+		\item If there is increased load on the reader endpoints
+		\item Replica autoscaling will allow more reader endpoints to be created
+	\end{itemize}
+	\item Custom Endpoints
+	\begin{itemize}
+		\item Define a subset of aurora instances as a custom endpoint
+		\item EX: have two larger RRs to run analytic queries on
+		\item Point those RRs to the custom endpoint, not the reader endpoint
+		\item Set up several custom endpoints for different types of workloads
+	\end{itemize}
+	\item Serverless
+	\begin{itemize}
+		\item Automated DB instantiation and auto scaling based on actual usage
+		\item Useful for unpredictable workloads
+		\item No capacity planning required
+	\end{itemize}
+	\item Multi-Master
+	\begin{itemize}
+		\item If you want immediate failover for write node (HA)
+		\item Every node does R/W vs promoting a RR as the new master
+	\end{itemize}
+	\item Global Aurora
+	\begin{itemize}
+		\item Aurora Global DB: 1 primary region, up to 5 secondary regions, up to 16 RR per secondary region
+	\end{itemize}
+	\item Can add ML based predictions to your applications via SQL (SageMaker/Comprehend)
+\end{itemize}
+
+\section{ElastiCache}
+\begin{itemize}
+	\item The way to get managed Redis or memcached
+	\item Caches are in-memory DBs with really high performance, low latency
+	\item Reduces load off DBs
+	\item Makes application stateless
+	\item Involves heavy application code changes
+\end{itemize}
+
+\subsection{Solution Architecture}
+\begin{itemize}
+	\item DB Cache
+	\begin{itemize}
+		\item Application queries ElastiCache, which sees if the query has already been made
+		\item if its already been made - cache hit, gets the answer straight from elasticache
+		\item if not - cache miss. We need to fetch the data from the DB and then write to elasticache
+		\item relieves load in RDS
+	\end{itemize}
+	\item user session store
+	\begin{itemize}
+		\item makes app stateless
+		\item app writes session data to cache
+		\item If the user is re-directed, retrieve session from elasticache
+	\end{itemize}
+\end{itemize}
+
+\subsection{Redis vs Memcached}
+\begin{itemize}
+	\item Redis
+	\begin{itemize}
+		\item Multi AZ with autofailover
+		\item Read replicas to scale reads and have high availability
+		\item Data durability
+		\item Sorta like RDS
+	\end{itemize}
+	\item Memcached
+	\begin{itemize}
+		\item Multi node for partitioning of data (sharding)
+		\item no HA, non persistent, no backup
+		\item Multi-threaded architecture
+	\end{itemize}
+\end{itemize}
+
+\subsection{Cache Security}
+\begin{itemize}
+	\item Does not support IAM authentication
+	\item Redis Auth (SSL in flight)
+\end{itemize}
+
+\subsection{Patterns}
+\begin{itemize}
+	\item Lazy loading: all the read data is cached, data can become stale in cache
+	\item Write through: adds or update data in the cache when written to a DB (no stale data)
+	\item Session store: store temp session data in a cache
+\end{itemize}
+
+\subsection{Use Cases}
+\begin{itemize}
+	\item Gaming leaderboard
+	\begin{itemize}
+		\item Redis sorted sets guarantee uniqueness and element ordering
+		\item When a new element is added, its ranked in real time, then added in correct order
+	\end{itemize}
+\end{itemize}
+
+
+\end{document}
