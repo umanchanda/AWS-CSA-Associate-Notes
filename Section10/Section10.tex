@@ -1,0 +1,109 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{Route53}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{Route53}
+\begin{itemize}
+	\item Managed DNS
+	\item the most common records are:
+	\begin{itemize}
+		\item A: hostname to IPv4
+		\item AAAA: hostname to IPv6
+		\item CNAME: hostname to hostname
+		\item Alias: hostname to AWS resource
+	\end{itemize}
+	\item Diagram for A record
+	\begin{itemize}
+		\item Browser sends DNS request to Route53 with hostname
+		\item Route53 responds with IP
+		\item Browser makes HTTP request to the IP address, application server responds with HTTP response
+	\end{itemize}
+	\item Can use public (you own or buy) or private domains (resolved by your instances in your VPCs)
+	\item Load balancing
+	\item Health checks
+	\item Routing policy
+	\item If you purchase a domain on godaddy and want to use it with R53: Create public hosted zone and update the 3rd party registrar NS records
+\end{itemize}
+
+\subsection{TTL}
+\begin{itemize}
+	\item Time to live, its a DNS record
+	\item cache the response of a DNS query, don't want to overload DNS
+	\item As soon as the browser sends a DNS request, it will cache it, along with the response
+	\item Higher TTL means less traffic on DNS but possibility of outdated records
+\end{itemize}
+
+\subsection{CNAME vs Alias}
+\begin{itemize}
+	\item AWS resources expose a hostname, but you want to expose a url
+	\item CNAME: points a hostname to any other hostname, only for non-root domain (ex: something.domain.com)
+	\item Alias: points a hostname to an aws resource (app.mydomain.com $\rightarrow$ blabla.domain.com). Free of charge, native health check
+	\item If you have a root domain use alias, if it's not a root domain you can use either (alias preferred)
+\end{itemize}
+
+\subsection{Health Checks}
+\begin{itemize}
+	\item if an instance is unhealthy, R53 will not send traffic to that instance
+	\item instance is unhealthy if fails three HCs in a row, opposite for healthy
+	\item default HC interval is 30 seconds
+	\item HTTP/TCP/HTTPS health checks
+	\item can integrate with CW and linked to R53 DNS queries
+\end{itemize}
+
+\section{Routing Policy}
+\begin{itemize}
+	\item Simple
+	\begin{itemize}
+		\item use to redirect to a single resource
+		\item no health checks
+		\item if multiple values are returned, a random record is returned
+	\end{itemize}
+	\item Weighted
+	\begin{itemize}
+		\item controls the percentage of the requests that go to a specific endpoint
+		\item EX: three EC2 instances. R53 sends x percent to EC2A, y percent to EC2B, and z percent to EC2C
+		\item helpful to test 1 percent of traffic on new app version for example
+		\item Helpful to split traffic between regions
+		\item Will create a number of A records depending on how many IP addresses are listed
+	\end{itemize}
+	\item Latency
+	\begin{itemize}
+		\item Redirect to the server that has the least latency close to us
+		\item Latency is evaluated in terms of user to designated AWS region
+	\end{itemize}
+	\item Failover
+	\begin{itemize}
+		\item Two EC2 instances, primary and secondary
+		\item HC on the primary instance, if it fails, it will failover to the secondary
+	\end{itemize}
+	\item Geolocation
+	\begin{itemize}
+		\item Different from latency, routing based on user location
+		\item here we specify: traffic from the UK should go to this specific IP
+		\item Should create a default policy in case there's no match on the location
+	\end{itemize}
+	\item Geoproximity
+	\begin{itemize}
+		\item Route traffic to your resources based on geographic location of users and resources
+		\item Ability to shift more traffic to resources based on the defined bias
+		\item Reosurces can be AWS (like AWS region) or not (like Lat/Long)
+		\item Specify bias values to change the size of the geographic location
+		\item Useful if you need to shift resources to a certain region or vice versa
+	\end{itemize}
+	\item Multivalue
+	\begin{itemize}
+		\item Route traffic to multiple resources
+		\item Want to associate a R53 HC with records
+		\item Up to 8 healthy records are returned for each multivalue query
+		\item Not a subsitute for ELB
+	\end{itemize}
+\end{itemize}
+
+
+\end{document}
