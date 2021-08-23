@@ -1,0 +1,21 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{SDK, IAM Roles and Policies}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{IAM Roles and Policies}
+\begin{itemize}
+	\item Create IAM policies with Policy Generator
+	\item Validate IAM roles and policies with Policy Simulator
+	\item EC2 Instance Metadata: allows EC2 instances to "learn about themselves" without using an IAM role for that purpose
+	\item Can retrieve IAM role but not IAM policy from metadata
+	\item Can curl from EC2 to that internal URL
+	\item SDK: if you want to perform actions on AWS directly from your applications code without using CLI
+\end{itemize}
+
+\end{document}
