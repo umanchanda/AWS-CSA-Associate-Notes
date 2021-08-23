@@ -1,0 +1,105 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{Containers on AWS: ECS, Fargate, ECR, and EKS}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{ECS}
+\begin{itemize}
+	\item elastic container service, allows you to launch docker containers on AWS
+	\item must provision and maintain the infrastructure (EC2 instances)
+	\item AWS takes care of starting and stopping containers
+	\item integrates with ALB to expose application to the web
+	\item Launch Types:
+	\begin{itemize}
+		\item EC2 launch type for ECS: 
+		\begin{itemize}
+			\item ECS cluster in a single VPC
+			\item Create ASG to create EC2 instances aka container instances. 
+			\item Run ECS agent on all the instances, register those instances to the ECS cluster, and start launching some tasks. 
+			\item Each EC2 instance can run one or more tasks
+		\end{itemize}
+		\item Fargate. 
+		\begin{itemize}
+			\item No EC2 instances to provision. Serverless offering
+			\item AWS just runs the containers for you based on CPU/RAM needs. 
+			\item Fargate will launch a task
+			\item To access the task, we will have an ENI (elastic network interface) launched within the VPC to bind this task to a network IP. 
+			\item More tasks = more ENIs. Each ENI is a distinct IP address
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsection{IAM Roles for ECS Tasks}
+\begin{itemize}
+	\item ECS tasks might need to interact with other AWS services - will need IAM roles for them
+	\item EC2 instance profile - used by ECS agent, makes API calls to ECS service, send container logs
+	\item ECS task role:
+	\begin{itemize}
+		\item allows each task to have a specific role
+		\item use different roles for the different ECS services you run
+		\item task role is defined in the task definition
+		\item task roles allow, for example, access to an s3 bucket
+	\end{itemize}
+\end{itemize}
+
+\subsection{Data Volumes - EFS File Systems}
+\begin{itemize}
+	\item if you want to share data: create EFS file system and mount it directly on the ECS tasks.
+	\item works for both EC2 and fargate tasks. 
+\end{itemize}
+
+\subsection{ECS Scaling}
+\begin{itemize}
+	\item Service CPU usage which is a CW metric, triggers CW alarm, autoscale
+	\item SQS queue, polls for messages, if queue length exceeds limit (CW metric), triggers an alarm, autoscale
+\end{itemize}
+
+\subsection{ECS Rolling Updates}
+\begin{itemize}
+	\item we can control how many tasks can be started and stopped, and in which order
+	\item EX: min 50 percent, max 100 percent, starting number of tasks: 4
+\end{itemize}
+
+\section{ECS Services and Tasks}
+\begin{itemize}
+	\item it is common to spin up an ECS cluster with a running service that connects to an ALB
+	\item when launching a container, it will get a random port assigned to it
+	\item ALB has dynamic port mapping feature - supports finding the right port on your EC2 instances
+	\item You can run multiple instances of the same container onto the same EC2 instance and have them exposed thru the same ALB. 
+	\item You must allow on the EC2 instance SG any port from the ALB SG
+\end{itemize}
+
+\subsection{Load Balancing for Fargate}
+\begin{itemize}
+	\item Fargate creates ENI for every task run. Each ENI has a unique IP but port remains the same. 
+	\item Must allow on the ENI SG the task port from the ALB SG
+\end{itemize}
+
+\subsection{ECS tasks invoked by Event Bridge}
+\begin{itemize}
+	\item allows you to invoke an ECS task, like by an event bridge or cloud watch event
+	\item EX: Fargate cluster, whenever a user uploads an object into S3 bucket, run a fargate task to process that object and insert some metadata into dynamoDB
+	\item Create AWS Event Bridge event from S3 bucket. The event has a rule as a target which is to run an ECS task. Make sure the task has the proper task role. 
+\end{itemize}
+
+\section{ECR}
+\begin{itemize}
+	\item Elastic Container Registry
+	\item Store, manage, and deploy containers on AWS, pay for what you use. 
+\end{itemize}
+
+\section{EKS}
+\begin{itemize}
+	\item Elastic kubernetes service
+	\item launch managed kubernetes clusters on AWS
+	\item kubernetes - deployment, scaling, and management of containerized applications
+	\item alternate to ECS. best if you already use kubernetes on-prem and want to migrate to AWS
+	\item EKS pods are like ECS tasks. They run on EKS nodes. The nodes can be managed by an ASG. 
+\end{itemize}
+
+\end{document}
