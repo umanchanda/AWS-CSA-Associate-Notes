@@ -1,0 +1,143 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{S3 Introduction}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{Buckets and Objects}
+\begin{itemize}
+	\item Allows people to store objects (files) in buckets (directories)
+	\item Globally unique name, defined at region level
+\end{itemize}
+
+\subsection{Objects}
+\begin{itemize}
+	\item Objects have a key
+	\item The key is the \textbf{full path}
+	\item Key is composed of prefix + object name
+	\item There is no concept of "directories" within buckets, although the UI will trick you to think otherwise
+	\item Just keys with very long names that contain slashes
+	\item Object values are the content of the body (max object size is 5TB)
+	\item If uploading more than 5 GB must do multi part upload
+	\item Metadata: list of text key/value pairs (system or user metadata)
+	\item Versioning: you can version your files at the bucket level. Best practice to version your buckets to protect against unintended deletes
+	\item When you delete a file with delete protection it adds a delete marker to it
+\end{itemize}
+
+\section{Encryption}
+\begin{itemize}
+	\item 4 methods to encrypt objects:
+	\begin{itemize}
+		\item SSE-S3: encrypts S3 objects using keys handled and managed by AWS
+		\item SSE-KMS: leverage AWS KMS to manage encryption keys
+		\item SSE-C: manage your own encryption keys
+		\item Client side encryption
+	\end{itemize}
+\end{itemize}
+
+\subsection{SSE-S3}
+\begin{itemize}
+	\item using keys handled and managed by s3
+	\item encrypted server side, AES256, must set header
+	\item Once you apply the header, S3 knows the object must be encrypted
+\end{itemize}
+
+\subsection{SSE-KMS}
+\begin{itemize}
+	\item Key management service, keys are handled and managed by this service
+	\item user control + audit trail
+	\item server side encryption, must apply a specific header
+\end{itemize}
+
+\subsection{SSE-C}
+\begin{itemize}
+	\item S3 does not store the encryption you provide
+	\item HTTPS must be used, encryption key must be provided in HTTP headers for every HTTP request made
+\end{itemize}
+
+\subsection{Client Side Encryption}
+\begin{itemize}
+	\item clients must encrypt data before sending to s3 and decrypt data when retrieving from s3
+	\item customer fully manages the keys and encryption cycle
+\end{itemize}
+
+\subsection{Encryption in transit: SSL/TLS}
+\begin{itemize}
+	\item Amazon S3 exposes: HTTP endpoint (non encrypted) and HTTPS endpoint (encryption in flight)
+	\item HTTPS is recommended, its usually the one by default
+\end{itemize}
+
+\section{Security and Bucket Policies}
+
+\subsection{Security}
+\begin{itemize}
+	\item user based: IAM policies (which API calls should be allowed for a specific user from IAM console)
+	\item Resource based: bucket policies (bucket wide rules from s3 console - allows cross account). object access control list (ACL - finer grain). Bucket Access Control list (ACL - less common)
+	\item An IAM principal can access an S3 object if: 
+	\begin{itemize}
+		\item the user IAM permissions allow it OR the resource policy ALLOWS it 
+		\item AND there's no explicit deny
+	\end{itemize}
+	\item Networking:  supports VPC endpoints (for instances in VPC w/out www internet)
+	\item Logging and audit: S3 access logs stored in other s3 bucket. API calls logged in cloudtrail
+\end{itemize}
+
+\subsection{Bucket Policies}
+\begin{itemize}
+	\item JSON based policies
+	\item Resources: buckets and objects
+	\item Actions: Set of API to allow or deny
+	\item Effect: allow/deny
+	\item Principal: the account/user to apply the policy to
+	\item Use S3 bucket for policy to:
+	\begin{itemize}
+		\item Grant public access to the bucket
+		\item Force objects to be encrypted at upload
+		\item Grant access to another account (cross account)
+	\end{itemize}
+	\item Block public access to buckets and objects granted through: new ACLs, any ACLs, or new public bucket or access point policies
+	\item Settings were created to prevent company data leaks
+\end{itemize}
+
+\section{Websites}
+\begin{itemize}
+	\item can host static websites can have them accessible on the web
+	\item bucketname.s3-website-awsregion.amazonaws.com
+	\item Bucket needs to be public: must create policy for it and enable public ACLs
+\end{itemize}
+
+\section{CORS}
+\begin{itemize}
+	\item Cross origin Resource Sharing
+	\item Origin: scheme (protocol), host (domain), and port, eg https://www.google.com, port 443 since https
+	\item We wan to get resources from a different origin
+	\item Web browser based mechanism to allow requests to other origins while visiting the main origin
+	\item Same origin: http://example.com/app1 and http://example.com/app2. we can make requests from the browser from the first to second url
+	\item Different origin: http://www.example.com and http://other.example.com. browser will block this request without necessary CORS headers (Access-Control-Allow-Origin)
+\end{itemize}
+
+\subsection{S3 CORS}
+\begin{itemize}
+	\item if a client does a cross origin request on our S3 bucket, we need to enable the correct S3 headers
+	\item You can allow for a specific origin or for all
+	\item EX: web browser makes GET request to s3 bucket that is website and CORS enabled
+	\item browser sends these headers:
+	\begin{itemize}
+		\item GET coffee.jpg
+		\item ORIGIN: http://urlofbucket.com
+	\end{itemize}
+	\item If the bucket is configured with the right CORS headers then the web browser will be able to make the request
+\end{itemize}
+
+\section{Consistency Model}
+\begin{itemize}
+	\item All operations are strongly consistent
+	\item After a: new PUT, overwrite PUT or DELETE
+	\item any: subsequent read request immediately receives the latest version of the object. subsequent list request immediately reflects changes. 
+\end{itemize}
+
+\end{document}
