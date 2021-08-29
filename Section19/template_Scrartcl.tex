@@ -1,0 +1,151 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{Serverless Overviews}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{Serverless}
+\begin{itemize}
+	\item devs don't manage servers, just deploy code
+	\item infrastructure is still there but the dev doesn't worry about it
+	\item lambda, dynamodb, cognito, api gateway, s3, sns/sqs, kinesis, step functions, and fargate
+\end{itemize}
+
+\section{Lambda}
+\begin{itemize}
+	\item virtual functions - no servers to manage
+	\item short executions, run on-demand, scaling is automated
+	\item increasing RAM will improve CPU and network
+	\item lambda container image - the image must implement the lambda runtime API
+	\item ECS/Fargate is preferred for running arbitrary Docker images
+\end{itemize}
+
+\subsection{Lambda Integrations}
+\begin{itemize}
+	\item API gateway = create REST API
+	\item Kinesis = data transformations
+	\item DynamoDB = insert data into DB
+	\item EX: serverless thumbnail creation
+	\begin{itemize}
+		\item New image uploaded in S3
+		\item Trigger s3 event notification a lambda function which creates a thumbnail
+		\item push the new thumbnail to S3
+		\item OR insert metadata into dynamoDB
+	\end{itemize}
+	\item EX: serverless CRON job
+	\begin{itemize}
+		\item CW event rule to trigger every 1 hr
+		\item integrated with a lambda function
+	\end{itemize}
+\end{itemize}
+
+\subsection{Lambda Limits}
+\begin{itemize}
+	\item Execution
+	\begin{itemize}
+		\item Memory: 128 MB - 10GB
+		\item Time: 900 seconds
+		\item Env vars 4KB
+		\item Disk capacity in the "function container": 512 MB
+		\item Concurrency: 1000
+	\end{itemize}
+	\item Deployment
+	\begin{itemize}
+		\item Deployment size compressed: 50mb
+		\item Uncompressed: 250mb
+	\end{itemize}
+\end{itemize}
+
+\subsection{Lambda@Edge}
+\begin{itemize}
+	\item Deploy lambda functions alongside each region in the world with a CloudFront CDN
+	\item Build more responsive applications, no need to manage servers, customize CDN content
+	\item Can use lambda to change CloudFront requests and responses
+	\begin{itemize}
+		\item After CF receives request from a viewer (viewer request)
+		\item Before CF forwards request to the origin (origin request)
+		\item After CF receives the response from the origin (origin response)
+		\item Before CF forwards the response to the viewer (viewer response)
+	\end{itemize}
+	\item EX: Global application, static website hosted on S3, user visits website, dynamic API to CF
+\end{itemize}
+
+\section{DynamoDB}
+\begin{itemize}
+	\item Serverless DB, NoSQL - not relational
+	\item Scales to massive workloads, distributed database
+	\item Fast and consistent in performance (low latency)
+	\item Made of tables, each table with a primary key
+	\item Each table can have an infinite number of items (rows)
+	\item Each item has attributes
+	\item Provisioned Throughput
+	\begin{itemize}
+		\item Table must have provisioned read and write capacity units
+		\item Read Capacity Units (RCU): throughput for reads
+		\item 1 RCU = 1 strongly consistent read of 4kB/sec
+		\item 1 RCU = 2 eventually consistent read of 4kb/sec
+		\item Write Capacity Units (WCU): throughput for writes
+		\item 1 WCU = 1 write of 1kb/sec
+		\item Can set up auto-scaling of throughput to meet demand
+	\end{itemize}
+\end{itemize}
+
+\subsection{Advanced Features}
+\begin{itemize}
+	\item DAX = DynamoDB accelerator, seamless cache for DynamoDB
+	\item Streams, changes in DynamoDB can end up in a DynamoDB stream. Stream can be read by Lambda
+	\item Transactions - all or nothing type of operations
+	\item On demand - no capacity planning needed, automatic scaling
+	\item Global tables - cross region replication
+\end{itemize}
+
+\section{API Gateway}
+\begin{itemize}
+	\item Create REST APIs for a client
+	\item clients talk to API Gateway which will then proxy the request to the lambda function
+	\item API Gateway + Lambda: no infra to manage
+	\item Support for Web Socket protocol
+	\item Transform and validate responses/requests
+	\item Integrations
+	\begin{itemize}
+		\item Lambda
+		\item HTTP - expose HTTP endpoints in the backend
+		\item AWS Service - expose any AWS API through API Gateway (EX: start AWS Step function)
+	\end{itemize}
+	\item Endpoint Types
+	\begin{itemize}
+		\item Edge Optimized: for global clients, is the default
+		\item Regional: for client in the same region
+		\item Private: only accessed from your VPC
+	\end{itemize}
+\end{itemize}
+
+\subsection{Security}
+\begin{itemize}
+	\item IAM Permissions - create IAM policy authorization and attach to user/role
+	\item API Gateway verifies IAM permissions
+	\item Lambda Authorizer - use Lambda to validate the token in header being passed
+	\item Cognito User Pools - cognito fully manages user lifecycle, API Gateway verifies identity automatically from AWS Cognito. No need to write custom code
+\end{itemize}
+
+\section{AWS Cognito}
+\begin{itemize}
+	\item We want to give our users an identity so they can interact with our application
+	\item Cognito User Pools - sign in functionality
+	\item Cognito Identity Pools - Federated identity, allow users to access AWS resources directly
+	\item Cognito Sync - Synchronize data from device to Cognito
+\end{itemize}
+
+\section{Serverless Application Model}
+\begin{itemize}
+	\item Framework for developing and deploying serverless application
+	\item all the configuration is YAML
+	\item Helps you run serverless stuff locally
+	\item Can use code deploy to deploy lambda functions
+\end{itemize}
+
+\end{document}
