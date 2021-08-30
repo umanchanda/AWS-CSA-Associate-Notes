@@ -1,0 +1,81 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{EC2 Fundamentals}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{EC2 Instance Types}
+\begin{itemize}
+	\item Naming Convention: m5.2xlarge
+	\begin{itemize}
+		\item m = instance class
+		\item 5 = generation
+		\item 2xlarge = size within instance class (larger size means more CPU and memory)
+	\end{itemize}
+	\item General purpose = T, M, A
+	\item Compute optimized = C
+	\item Memory optimized = R, X, z
+	\item Storage optimized = I, G, H
+\end{itemize}
+
+\section{Security Groups}
+\begin{itemize}
+	\item Control how traffic is allowed in/out of EC2 instance
+	\item only contain ALLOW rules, reference by IP or SG
+	\item Lives "outside" the EC2 - if traffic is blocked the EC2 instance won't see it
+\end{itemize}
+
+\section{Instance Launch Types}
+\begin{itemize}
+	\item On demand: short workload, predictable pricing
+	\begin{itemize}
+		\item Pay for what you use
+		\item Highest cost but no upfront payment
+		\item Recommended for short term and un-interrupted workloads where you can't predict how the application will behave
+	\end{itemize}
+	\item Reserved: minimum 1 year
+	\begin{itemize}
+		\item 75 percent discount compared to on demand
+		\item Reserve a specific instance type
+		\item Recommended for steady state usage applications (think database)
+	\end{itemize}
+	\item Spot: short workloads, cheap, can lose instances (less reliable)
+	\begin{itemize}
+		\item highest discount compared to on-demand
+		\item can lose instances at any point if your max price is less than the current spot price
+		\item Most cost efficient, useful for workloads that are resilient to failure
+		\item like batch jobs, data analysis, image processing
+	\end{itemize}
+	\item Dedicated hosts: book an entire physical server, control instance placement
+	\begin{itemize}
+		\item allow you to use your existing server-bound software licenses
+		\item allocated for a 3 yr reservation
+		\item more expensive, useful for a complicated licensing model
+		\item if your company has specific regulatory requirements
+	\end{itemize}
+\end{itemize}
+
+\subsection{Spot Instance Requests}
+\begin{itemize}
+	\item Can get up to 90 percent discount compared to on-demand
+	\item Define max spot price and get the instance while current spot price < max
+	\item if that limit is breached you can stop or terminate instance
+	\item Spot block - block the spot instance for a specified time frame (1 to 6 hr) w/out interruptions
+	\item Batch jobs, data analysis, workloads resilient to failures
+	\item Not great for critical jobs/databases
+	\item How to terminate spot instance?
+	\begin{itemize}
+		\item Define spot request - the specs for your instance(s)
+		\item can cancel spot request based on whether request type is one time or persistent
+		\item You must cancel the spot request that is open/active/disabled and then terminate the instances
+	\end{itemize}
+	\item Spot fleets = set of spot instances + (optional) on-demand instances
+	\item Spot fleet will try and meet target capacity with price constraints
+	\item Spot fleets allow us to automatically request spot instances with the lowest price
+\end{itemize}
+
+\end{document}
