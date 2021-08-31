@@ -1,0 +1,89 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{EC2 - Solutions Architect Associate Level}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{Private vs Public vs Elastic IP}
+\begin{itemize}
+	\item Public IP - accessible over the public Internet, can be identified on the internet, must be unique
+	\item Private IP - only accessible within your private network, must be unique in that private network
+	\item IPs in private network connect to internet via NAT and internet gateway (proxy)
+	\item Elastic IP - when you stop and start an ec2 instance it changes its IP
+	\item Can mask the failure of an instance or software by rapidly remapping the address to another instance in your acct
+	\item Avoid elastic IP - use random public IP and register DNS name to it, or use a ELB and no public IP
+\end{itemize}
+
+\section{EC2 Placement Groups}
+\begin{itemize}
+	\item If you want control over the EC2 Instance placement strategy
+	\item When creating a placement group, you specify one of the following strategies for the group:
+	\begin{itemize}
+		\item Cluster: clusters instances into a low latency group in a single AZ. Use case: Big data job that needs to complete fast. 
+		\item Spread: spreads instances across underlying hardware (critical applications). Minimized risk, maximize high availability. 
+		\item Partition: spreads instances across many different partitions within an AZ. Scale to 100s of EC2 instances per group (Hadoop,Cassandra, Kafka). 
+	\end{itemize}
+\end{itemize}
+
+\section{Elastic Network Interface}
+\begin{itemize}
+	\item Logical component in a VPC that represents a virtual network card
+	\item Provides an EC2 instance with network connectivity
+	\item They have:
+	\begin{itemize}
+		\item Primary private IPv4 and one or more secondary IPv4
+		\item One elastic IP
+		\item One public IP
+		\item one or more SGs
+		\item MAC address
+	\end{itemize}
+	\item Can create an ENI independently and attach them on the fly or move them for failover
+\end{itemize}
+
+\section{EC2 Hibernate}
+\begin{itemize}
+	\item Stop instance: data on disk (EBS) is kept intact in the next start
+	\item Terminate: any EBS volumes (root) also set-up to be destroyed is lost
+	\item On start the following happens:
+	\begin{itemize}
+		\item First start: the OS boots and EC2 user data script is run
+		\item Following starts: the OS boots up
+		\item Application starts, caches get warmed up, and that can take time
+	\end{itemize}
+	\item Hibernate:
+	\begin{itemize}
+		\item in-memory RAM is preserved
+		\item instance boot is much faster
+		\item RAM state is written to a file in teh root EBS volume
+		\item that EBS volume must be encrypted
+	\end{itemize}
+\end{itemize}
+
+\section{Advanced Concepts}
+
+\subsection{EC2 Nitro}
+\begin{itemize}
+	\item Underlying platform for next generation of EC2 instances
+	\item New Virtualization technology - better performance like networking, \textbf{higher speed EBS}
+	\item Better security
+\end{itemize}
+
+\subsection{vCPU}
+\begin{itemize}
+	\item core = CPU
+	\item Multiple threads can run on one CPU
+	\item Each thread is represented as a virtual CPU
+	\item m5.2xlarge. 4 CPU, 2 threads per CPU = 8 vCPU
+\end{itemize}
+
+\subsection{Capacity Reservations}
+\begin{itemize}
+	\item Ensure you have EC2 capacity when needed
+	\item Capacity access is immediate, planned end-date for reservation
+\end{itemize}
+
+\end{document}
