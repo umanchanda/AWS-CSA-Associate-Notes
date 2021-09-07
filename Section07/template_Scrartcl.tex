@@ -1,0 +1,126 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{EC2 Instance Storage}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{EBS}
+\begin{itemize}
+	\item Elastic Block Store
+	\item Network drive you can attach to your instances while they run
+	\item allows your instances to persist data, even after their termination
+	\item only mounted to one instance at a time, bound to a specific AZ
+	\item Like a network USB stick
+	\item uses the network to communicate the instance, which means there might be a bit of latency
+	\item can be de-attached and re-attached quickly
+	\item provisioned capacity
+	\item Delete on termination attribute - controls the EBS behavior when an EC2 instance terminates
+	\begin{itemize}
+		\item by default the root EBS volume is deleted
+		\item for other volumes, it is not enabled
+	\end{itemize}
+\end{itemize}
+
+\subsection{EBS Snapshots}
+\begin{itemize}
+	\item make a backup (snapshot) of your EBS volume at a point in time
+	\item recommended to de-attach volume first
+	\item can copy snapshots across AZ or region
+\end{itemize}
+
+\subsection{EBS Volume Types}
+\begin{itemize}
+	\item 6 types
+	\begin{itemize}
+		\item gp2/gp3 (SSD) - general purpose volume, can be used as boot volume
+		\item io1/io2 (SSD) - high performance (mission critical), can be used as boot volume
+		\item st1 (HDD) - low cost, designed for frequently accessed, throughput-intensive workloads
+		\item sc1 (HDD) - lowest cost, less frequently accessed workloads
+	\end{itemize}
+	\item characterized in size, throughput, IOPS (i/o ops per sec)
+	\item Provisioned IOPS (PIOPS) - for business critical apps with sustained IOPS performance
+\end{itemize}
+
+\subsection{EBS Multi Attach}
+\begin{itemize}
+	\item Attach the same EBS volume to multiple EC2 instances in the same AZ
+	\item Achieve higher application availability in clustered linux apps (ex: teradata)
+\end{itemize}
+
+\subsection{EBS Encryption}
+\begin{itemize}
+	\item Data at rest is encrypted inside the volume
+	\item Data in flight moving between the instance and volume is encrypted
+	\item All snapshots are encrypted
+	\item To encrypt an unencrypted EBS volume:
+	\begin{itemize}
+		\item Create snapshot
+		\item encrypt the snapshot
+		\item Create new EBS volume from that snapshot
+		\item attach it to the original instance
+	\end{itemize}
+\end{itemize}
+
+\subsection{EBS RAID}
+\begin{itemize}
+	\item used if you want to massively increase IOPS or mirror your EBS volumes
+	\item Options: RAID0 and 1, 5/6 (not recommended for EBS)
+	\item RAID0 - increase performance. combine 2 or more volumes and getting the total disk space and I/O. If disk fails all the data is failed. 
+	\item RAID1 - increase fault tolerance. mirror a volume to another. 
+\end{itemize}
+
+\section{AMI}
+\begin{itemize}
+	\item amazon machine image, customization of an EC2 instance
+	\item faster boot/config time because all your software is pre-packaged
+	\item built for a specific region (and can be copied)
+	\item public AMI - maintained by AWS, your own AMI, or AMI marketplace
+	\item build AMI - will create EBS snapshots
+\end{itemize}
+
+\section{EC2 Instance Store}
+\begin{itemize}
+	\item EBS volumes are network drives with good but limited performance
+	\item If you need a high performance hardware disk, use EC2 instance store
+	\item Its a physical drive attached to the server
+	\item Lose their storage if they're stopped
+	\item Good for buffer/cache/scratch data/temp content. Not for long term storage
+	\item Risk of data loss if hardware fails
+\end{itemize}
+
+\section{EFS}
+\begin{itemize}
+	\item Elastic File system
+	\item Managed NFS (network file system) that can be mounted on many EC2
+	\item works with EC2 instances in multi AZ
+	\item pay per use
+	\item attach SG to EFS, then mount 1 or more ec2 instances. each instance has access to the same data
+	\item use cases: content mgmt, web serving, data sharing, wordpress
+	\item file system scales automatically
+	\item Performance mode: higher latency, throughput, highly parallel
+	\item Throughput mode: bursting, provisioned - set your throughput regardless of storage size
+	\item Storage tiers: lifecycle mgmt feature - move file after N days, generally for frequently accessed files
+\end{itemize}
+
+\section{EFS vs EBS}
+\begin{itemize}
+	\item EBS
+	\begin{itemize}
+		\item can be attached to only 1 instance at a time
+		\item locked at the AZ level
+		\item root EBS volumes get terminated by default
+		\item network volume
+	\end{itemize}
+	\item EFS
+	\begin{itemize}
+		\item mounted to several EC2 instances, only on linux instances
+		\item more expensive, but you only get billed for what you use
+		\item network file system
+	\end{itemize}
+\end{itemize}
+
+\end{document}
