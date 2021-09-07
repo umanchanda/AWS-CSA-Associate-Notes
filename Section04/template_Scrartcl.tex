@@ -1,0 +1,37 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{IAM and AWS CLI}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{IAM}
+\begin{itemize}
+	\item Users are people within your organization and can be grouped
+	\item Users can be part of multiple groups
+	\item Permissions
+	\begin{itemize}
+		\item Users/groups can be assigned JSON documents called policies
+		\item policies define the permissions of the users
+		\item least privileged principle
+	\end{itemize}
+\end{itemize}
+
+\subsection{IAM policies}
+\begin{itemize}
+	\item if you attach a policy at the group level - all members of the group get those policies
+	\item structure: version, id, statement
+	\item statement consists of: sid, effect, principal, action, resource, condition (optional)
+\end{itemize}
+
+\subsection{IAM roles}
+\begin{itemize}
+	\item Some aws services will need to perform actions on your behalf
+	\item assign permissions to aws services with IAM roles
+	\item common roles: ec2 instance roles, lambda function roles
+\end{itemize}
+
+\end{document}
