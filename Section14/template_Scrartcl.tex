@@ -1,0 +1,145 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{Advanced Amazon S3 and Athena}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{S3}
+
+\subsection{S3 MFA Delete}
+\begin{itemize}
+	\item Enable versioning on bucket
+	\item Need MFA to delete an object version or suspend versioning
+	\item Can be enabled only via CLI
+\end{itemize}
+
+\subsection{S3 Default Encryption}
+\begin{itemize}
+	\item One way to "force encryption" is to use a bucket policy and refuse any API call to PUT an S3 object w/out encryption headers
+	\item Another way is via "default encryption" option
+	\item Can be enabled in the console
+\end{itemize}
+
+\subsection{Access Logs}
+\begin{itemize}
+	\item May need to log all access to s3 buckets (athena)
+	\item Could send all logs to a specific logging bucket
+	\item Do not send your logging bucket to be the monitored bucket
+\end{itemize}
+
+\subsection{Replication}
+\begin{itemize}
+	\item CRR = Cross region replication
+	\item SRR = Same region replication
+	\item Bucket in region A, asynchronously replicate in region B
+	\item Buckets can be in different accounts
+	\item Use cases: compliance, lower latency, replication across accounts
+	\item After activating, only new objects are replicated
+	\item No chaining of replication
+\end{itemize}
+
+\subsection{Pre Signed URLs}
+\begin{itemize}
+	\item Can generate pre-signed URLs using SDK or CLI
+	\item valid for default of 3600 seconds, can change
+	\item EX: allow only logged-in users to download a premium video on S3, allow temporarily a user to upload a file to a precise location in our bucket
+\end{itemize}
+
+\subsection{S3 Storage Classes}
+\begin{itemize}
+	\item Amazon S3 standard
+	\begin{itemize}
+		\item General purpose
+		\item High durability
+		\item Use cases: big data analytics, mobile/gaming apps, content distribution
+	\end{itemize}
+	\item Amazon S3 Standard-Infrequent Access (IA)
+	\begin{itemize}
+		\item Suitable for data less frequently accessed, but requires rapid access when needed
+		\item Data store for DR
+	\end{itemize}
+	\item Amazon S3 One Zone-Infrequent Access
+	\begin{itemize}
+		\item Same as previous but data is stored in a single AZ
+	\end{itemize}
+	\item Amazon S3 Intelligent Tiering
+	\begin{itemize}
+		\item Automatically moves objects between 2 access tiers based on changing access patterns
+	\end{itemize}
+	\item Amazon Glacier
+	\begin{itemize}
+		\item Low cost object storage meant for archiving/backup
+		\item Data is retained for the long term
+		\item Alternative to on premise magnetic tapes
+		\item each item in glacier is called an archive
+		\item archives are stored in vaults
+		\item min storage duration is 90 days
+	\end{itemize}
+	\item Amazon Glacier Deep Archive
+	\begin{itemize}
+		\item Three retrieval options for glacier: expedited, standard, bulk
+		\item Super long term storage (min 180 days)
+	\end{itemize}
+\end{itemize}
+
+\subsection{S3 Lifecycle Rules}
+\begin{itemize}
+	\item Can transition objects between storage classes
+	\item Moving objects can be automated using a lifecycle configuration
+	\item Transition actions, expiration actions
+	\item Can use analytics to help determine when to transition objects
+\end{itemize}
+
+\subsection{S3 Performance}
+\begin{itemize}
+	\item automatically scale to high request rates, latency
+	\item how to optimize performance
+	\begin{itemize}
+		\item multi part upload - parallelize uploads for large files
+		\item s3 transfer acceleration - increase transfer speed by transferring files to an AWS edge location which will forward the data to the s3 bucket in the target region
+	\end{itemize}
+\end{itemize}
+
+\subsection{S3+Glacier Select}
+\begin{itemize}
+	\item retrieve less data using SQL, can filter by rows and columns
+	\item less network transfer
+\end{itemize}
+
+\subsection{S3 Requester Pays}
+\begin{itemize}
+	\item In general bucket owners pay for all s3 storage and data transfer costs
+	\item with requester pays buckets, the requester pays for these costs instead
+\end{itemize}
+
+\section{Athena}
+\begin{itemize}
+	\item Serverless service to perform analytics against S3 files
+	\item Uses SQL to query the files
+	\item Charged per query and amount of data scanned
+	\item Analyze data DIRECTLY in S3
+\end{itemize}
+
+\section{Quiz}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item you are looking to build an index of your files in s3 using RDS postgres
+		\item to build this index it is necessary to read the first 250 bytes of each object in s3
+		\item which contains some metadata about the content of the file itself
+		\item there are over 100,000 files in your s3 bucket
+		\item how can you build this index efficiently
+	\end{itemize}
+	\item Answer
+	\begin{itemize}
+		\item Create application that will traverse s3 bucket
+		\item issue byte range fetch for the first 250 bytes
+		\item store that info in RDS
+	\end{itemize}
+\end{itemize}
+
+\end{document}
