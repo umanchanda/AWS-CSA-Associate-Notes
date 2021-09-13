@@ -1,0 +1,498 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{Exam One Notes}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{Questions I had no idea/got wrong}
+
+\subsection{Question 1}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An e-commerce company is looking for a solution with high availability, as it plans to migrate its flagship application to a fleet of Amazon EC2 instances. 
+		\item The solution should allow for content-based routing as part of the architecture.
+		\item As a Solutions Architect, which of the following will you suggest for the company?
+	\end{itemize}
+	\item Answer: Use an Application Load Balancer for distributing traffic to the EC2 instances spread across different Availability Zones. Configure Auto Scaling group to mask any failure of an instance
+\end{itemize}
+
+\subsection{Question 4}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item Data managed on Microsoft's Distributed File System
+		\item Transition to cloud and run data intensive workloads
+		\item Which service can facilitate the migration of these workloads
+	\end{itemize}
+	\item Answer: Amazon FSx for Windows File Server
+\end{itemize}
+
+\subsection{Question 5}
+\begin{itemize}
+	\item Question 
+	\begin{itemize}
+		\item 10 independent applications with an on-premises data footprint of about 70TB for each application
+		\item Two weeks to carry out the data migration from on-premises data center to AWS Cloud and establish connectivity.
+		\item Which of the following are the MOST cost-effective options for completing the data transfer and establishing connectivity? (Select two)
+	\end{itemize}
+	\item Answer: Order 10 Snowball Edge Storage Optimized devices to complete the one-time data transfer
+	\item Answer: Setup Site-to-Site VPN to establish connectivity between the on-premises data center and AWS Cloud
+\end{itemize}
+
+\subsection{Question 6}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A retail company has developed a REST API which is deployed in an Auto Scaling group behind an Application Load Balancer. 
+		\item The API stores the user data in DynamoDB and any static content, such as images, are served via S3. \item On analyzing the usage trends, it is found that 90 percent of the read requests are for commonly accessed data across all users.
+		\item As a Solutions Architect, which of the following would you suggest as the MOST efficient solution to improve the application performance?
+	\end{itemize}
+	\item Answer: Enable DynamoDB Accelerator (DAX) for DynamoDB and CloudFront for S3
+\end{itemize}
+
+\subsection{Question 8}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item seismological data for the last 100 years
+		\item The data has a velocity of 1GB per minute
+		\item You would like to store the data with only the most relevant attributes to build a predictive model for earthquakes.
+		\item What AWS services would you use to build the most cost-effective solution with the LEAST amount of infrastructure maintenance?
+	\end{itemize}
+	\item Answer: Ingest the data in Kinesis Data Firehose and use a Lambda function to filter and transform the incoming stream before the output is dumped on S3
+\end{itemize}
+
+\subsection{Question 9}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A data analytics company measures what the consumers watch and what advertising they’re exposed to. \item This real-time data is ingested into its on-premises data center and subsequently, the daily data feed is compressed into a single file and uploaded on Amazon S3 for backup. 
+		\item The typical compressed file size is around 2 GB.
+		\item Which of the following is the fastest way to upload the daily compressed file into S3?
+	\end{itemize}
+	\item Answer: Upload the compressed file using multipart upload with S3 transfer acceleration
+\end{itemize}
+
+\subsection{Question 11}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item enabled AWS Shield Advanced across multiple AWS accounts owned by the company
+		\item Upon analysis, the company has found that the costs incurred are much higher than expected.
+		\item Which of the following would you attribute as the underlying reason for the unexpectedly high costs for AWS Shield Advanced service?
+	\end{itemize}
+	\item Answer: Consolidated billing has not been enabled. All the AWS accounts should fall under a single consolidated billing for the monthly fee to be charged only once 
+\end{itemize}
+
+\subsection{Question 15}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A leading video streaming service delivers billions of hours of content from Amazon S3 to customers around the world. 
+		\item Amazon S3 also serves as the data lake for its big data analytics solution. 
+		\item The data lake has a staging zone where intermediary query results are kept only for 24 hours. These results are also heavily referenced by other parts of the analytics pipeline.
+		\item Which of the following is the MOST cost-effective strategy for storing this intermediary query data?
+	\end{itemize}
+	\item Answer: Store the intermediary query results in S3 Standard storage class. S3 Standard offers high durability, availability, and performance object storage for frequently accessed data. 
+\end{itemize}
+
+\subsection{Question 16}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item were asked to identify the invalid storage class lifecycle transitions for objects stored on S3.
+		\item Can you spot the INVALID lifecycle transitions from the options below? (Select two)
+	\end{itemize}
+	\item Answer: S3 Intelligent-Tiering $\rightarrow$ S3 Standard
+	\item Answer: S3 One Zone-IA $\rightarrow$ S3 Standard-IA
+	\item Following are the unsupported life cycle transitions for S3 storage classes
+	\begin{itemize}
+		\item Any storage class to the S3 Standard storage class. 
+		\item Any storage class to the Reduced Redundancy storage class. 
+		\item The S3 Intelligent-Tiering storage class to the S3 Standard-IA storage class. 
+		\item The S3 One Zone-IA storage class to the S3 Standard-IA or S3 Intelligent-Tiering storage classes.
+	\end{itemize}
+\end{itemize}
+
+\subsection{Question 17}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item defined different retention periods for different objects present in the Amazon S3 buckets
+		\item based on the compliance requirements
+		\item But, the retention rules do not seem to work as expected.
+		\item Which of the following options represent a valid configuration for setting up retention periods for objects in Amazon S3 buckets? (Select two)
+	\end{itemize}
+	\item Answer: When you apply a retention period to an object version explicitly, you specify a Retain Until Date for the object version
+	\item Answer: Different versions of a single object can have different retention modes and periods 
+\end{itemize}
+
+\subsection{Question 19}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item These images are kept encrypted in S3 by using AWS-KMS 
+		\item and the company manages its own Customer Master Key (CMK) for encryption. 
+		\item A member of the DevOps team accidentally deleted the CMK a day ago
+		\item As a solutions architect, which of the following steps would you recommend to solve this issue?
+	\end{itemize}
+	\item Answer: As the CMK was deleted a day ago, it must be in the 'pending deletion' status and hence you can just cancel the CMK deletion and recover the key
+\end{itemize}
+
+\subsection{Question 20}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A financial services company uses Amazon GuardDuty for analyzing its AWS account metadata to meet the compliance guidelines. 
+		\item However, the company has now decided to stop using GuardDuty service. 
+		\item All the existing findings have to be deleted and cannot persist anywhere on AWS Cloud.
+		\item Which of the following techniques will help the company meet this requirement?
+	\end{itemize}
+	\item Answer: Disable the service in the general settings - Disabling the service will delete all remaining data, including your findings and configurations before relinquishing the service permissions and resetting the service. 
+	\item Amazon GuardDuty offers threat detection that enables you to continuously monitor and protect your AWS accounts, workloads, and data stored in Amazon S3.
+\end{itemize}
+
+\subsection{Question 21}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item As part of a pilot program, a biotechnology company wants to integrate data files from its on-premises analytical application with AWS Cloud via an NFS interface.
+		\item Which of the following AWS service is the MOST efficient solution for the given use-case?
+	\end{itemize}
+	\item Answer: AWS Storage Gateway - File Gateway
+	\item AWS Storage Gateway is a hybrid cloud storage service that gives you on-premises access to virtually unlimited cloud storage. The service provides three different types of gateways – Tape Gateway, File Gateway, and Volume Gateway – that seamlessly connect on-premises applications to cloud storage, caching data locally for low-latency access.
+\end{itemize}
+
+\subsection{Question 24}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A major bank is using SQS to migrate several core banking applications to the cloud to ensure high availability and cost efficiency while simplifying administrative complexity and overhead. 
+		\item The development team at the bank expects a peak rate of about 1000 messages per second to be processed via SQS. 
+		\item It is important that the messages are processed in order.
+	\end{itemize}
+	\item Answer: Use Amazon SQS FIFO queue in batch mode of 4 messages per operation to process the messages at the peak rate
+	\item SQS offers two types of message queues: Standard queues vs FIFO queues.
+	\begin{itemize}
+		\item For FIFO queues, the order in which messages are sent and received is strictly preserved (i.e. First-In-First-Out).
+		\item On the other hand, the standard SQS queues offer best-effort ordering. This means that occasionally, messages might be delivered in an order different from which they were sent.
+	\end{itemize}
+\end{itemize}
+
+\subsection{Question 25}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An Electronic Design Automation (EDA) application produces massive volumes of data that can be divided into two categories
+		\item The 'hot data' needs to be both processed and stored quickly in a parallel and distributed fashion.
+		\item The 'cold data' needs to be kept for reference with quick access for reads and updates at a low cost.
+		\item Which of the following AWS services is BEST suited to accelerate the aforementioned chip design process?
+	\end{itemize}
+	\item Answer: Amazon FSx for Lustre makes it easy and cost-effective to launch and run the world’s most popular high-performance file system.
+	\item The open-source Lustre file system is designed for applications that require fast storage – where you want your storage to keep up with your compute. 
+\end{itemize}
+
+\subsection{Question 28}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item CloudFront offers a multi-tier cache in the form of regional edge caches that improve latency.
+		\item However, there are certain content types that bypass the regional edge cache, and go directly to the origin.
+		\item Which of the following content types skip the regional edge cache? (Select two)
+	\end{itemize}
+	\item Answer: Dynamic content, as determined at request time (cache-behavior configured to forward all headers)
+	\item Dynamic content, as determined at request time (cache-behavior configured to forward all headers), does not flow through regional edge caches, but goes directly to the origin. So this option is correct.
+	\item Answer: Proxy methods PUT/POST/PATCH/OPTIONS/DELETE go directly to the origin
+	\item Proxy methods PUT/POST/PATCH/OPTIONS/DELETE go directly to the origin from the POPs and do not proxy through the regional edge caches. So this option is also correct.
+\end{itemize}
+
+\subsection{Question 29}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item The engineering team at an e-commerce company wants to establish a dedicated, encrypted, low latency, and high throughput connection between its data center and AWS Cloud. 
+		\item The engineering team has set aside sufficient time to account for the operational overhead of establishing this connection.
+		\item As a solutions architect, which of the following solutions would you recommend to the company?
+	\end{itemize}
+	\item Answer: Use AWS Direct Connect plus VPN to establish a connection between the data center and AWS Cloud
+	\item AWS Direct Connect is a cloud service solution that makes it easy to establish a dedicated network connection from your premises to AWS. AWS Direct Connect lets you establish a dedicated network connection between your network and one of the AWS Direct Connect locations.
+\end{itemize}
+
+\subsection{Question 30}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A research group needs a fleet of EC2 instances for a specialized task that must deliver high random I/O performance. 
+		\item Each instance in the fleet would have access to a dataset that is replicated across the instances. \item Because of the resilient application architecture, the specialized task would continue to be processed even if any instance goes down, 
+		\item as the underlying application architecture would ensure the replacement instance has access to the required dataset.
+		\item Which of the following options is the MOST cost-optimal and resource-efficient solution to build this fleet of EC2 instances?
+	\end{itemize}
+	\item Answer: Use Instance Store based EC2 instances
+	\item An instance store provides temporary block-level storage for your instance. This storage is located on disks that are physically attached to the host computer.
+\end{itemize}
+
+\subsection{Question 32}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A media agency stores its re-creatable assets on Amazon S3 buckets. 
+		\item The assets are accessed by a large number of users for the first few days and the frequency of access falls down drastically after a week. 
+		\item Although the assets would be accessed occasionally after the first week, but they must continue to be immediately accessible when required. 
+		\item The cost of maintaining all the assets on S3 storage is turning out to be very expensive and the agency is looking at reducing costs as much as possible.
+		\item As a Solutions Architect, can you suggest a way to lower the storage costs while fulfilling the business requirements?
+	\end{itemize}
+	\item Answer: Configure a lifecycle policy to transition the objects to Amazon S3 One Zone-Infrequent Access (S3 One Zone-IA) after 30 days
+	\item S3 One Zone-IA is for data that is accessed less frequently, but requires rapid access when needed. 
+	\item stores data in a single AZ and costs 20 percent less than S3 Standard-IA. 
+	\item S3 One Zone-IA is ideal for customers who want a lower-cost option for infrequently accessed
+\end{itemize}
+
+\subsection{Question 33}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item The product team at a startup has figured out a market need to support both stateful and stateless client-server communications 
+		\item via the APIs developed using its platform. 
+		\item You have been hired by the startup as a solutions architect to build a solution to fulfill this market need using AWS API Gateway.
+		\item Which of the following would you identify as correct?
+	\end{itemize}
+	\item Answer: 
+\end{itemize}
+
+\subsection{Question 34}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item The technical teams at the overseas branch offices have reported huge delays in uploading large video files to the destination S3 bucket.
+		\item Which of the following are the MOST cost-effective options to improve the file upload speed into S3? (Select two)
+	\end{itemize}
+	\item Answer: Use Amazon S3 Transfer Acceleration to enable faster file uploads into the destination S3 bucket
+	\item Amazon S3 Transfer Acceleration enables fast, easy, and secure transfers of files over long distances between your client and an S3 bucket.
+	\item Answer: Use multipart uploads for faster file uploads into the destination S3 bucket
+	\item Multipart upload allows you to upload a single object as a set of parts. Each part is a contiguous portion of the object's data. You can upload these object parts independently and in any order. 
+\end{itemize}
+
+\subsection{Question 36}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item The application is deployed on several Amazon EC2 instances running behind an Application Load Balancer
+		\item With new government regulations, the company has been asked to block access from two countries and allow access only from the home country of the company.
+		\item Which configuration should be used to meet this changed requirement?
+	\end{itemize}
+	\item Answer: Configure AWS WAF on the Application Load Balancer in a VPC
+	\item AWS WAF is a web application firewall service that lets you monitor web requests and protect your web applications from malicious requests. 
+	\item You can use AWS WAF with your Application Load Balancer to allow or block requests based on the rules in a web access control list (web ACL). 
+	\item Geographic (Geo) Match Conditions in AWS WAF allows you to use AWS WAF to restrict application access based on the geographic location of your viewers. 
+\end{itemize}
+
+\subsection{Question 37}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item specific EC2 instance that is part of an Auto Scaling group using a step scaling policy. 
+		\item The team is facing a maintenance challenge - every time the team deploys a maintenance patch, the instance health check status shows as out of service for a few minutes.
+		\item This causes the Auto Scaling group to provision another replacement instance immediately.
+		\item As a solutions architect, which are the MOST time/resource efficient steps that you would recommend so that the maintenance work can be completed at the earliest? (Select two)
+	\end{itemize}
+	\item Answer: Put the instance into the Standby state and then update the instance by applying the maintenance patch. Once the instance is ready, you can exit the Standby state and then return the instance to service
+	\item You can put an instance that is in the InService state into the Standby state, update some software or troubleshoot the instance, and then return the instance to service. Instances that are on standby are still part of the Auto Scaling group, but they do not actively handle application traffic.
+	\item Suspend the ReplaceUnhealthy process type for the Auto Scaling group and apply the maintenance patch to the instance. Once the instance is ready, you can manually set the instance's health status back to healthy and activate the ReplaceUnhealthy process type again
+	\item The ReplaceUnhealthy process terminates instances that are marked as unhealthy and then creates new instances to replace them. Amazon EC2 Auto Scaling stops replacing instances that are marked as unhealthy.
+\end{itemize}
+
+\subsection{Question 39}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A file-hosting service uses Amazon S3 under the hood to power its storage offerings. 
+		\item Currently all the customer files are uploaded directly under a single S3 bucket. 
+		\item The engineering team has started seeing scalability issues where customer file uploads have started failing during the peak access hours with more than 5000 requests per second.
+		\item Which of the following is the MOST resource efficient and cost-optimal way of addressing this issue?
+	\end{itemize}
+	\item Answer: Change the application architecture to create customer-specific custom prefixes within the single bucket and then upload the daily files into those prefixed locations
+	\item There are no limits to the number of prefixes in a bucket. You can increase your read or write performance by parallelizing reads. 
+	\item if you have a file f1 stored in an S3 object path like so $\textit{s3://your\_bucket\_name/folder1/sub\_folder\_1/f1}$, then $\textit{/folder1/sub\_folder\_1/}$ becomes the prefix for file \textit{f1}.
+\end{itemize}
+
+\subsection{Question 40}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A retail company uses Amazon EC2 instances, API Gateway, Amazon RDS, Elastic Load Balancer and CloudFront services. To improve the security of these services, the Risk Advisory group has suggested a feasibility check for using the Amazon GuardDuty service.
+		\item Which of the following would you identify as data sources supported by GuardDuty?
+	\end{itemize}
+	\item Answer: VPC Flow Logs, DNS logs, CloudTrail events
+	\item Amazon GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior to protect your AWS accounts, workloads, and data stored in Amazon S3. 
+\end{itemize}
+
+\subsection{Question 42}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A large IT company wants to federate its workforce into AWS accounts and business applications.
+		\item Which of the following AWS services can help build a solution for this requirement? (Select two)
+	\end{itemize}
+	\item Answer: Use AWS Single Sign-On (SSO)
+	\item Answer: Use AWS Identity and Access Management (IAM)
+\end{itemize}
+
+\subsection{Question 44}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item The sourcing team at the US headquarters of a global e-commerce company is preparing a spreadsheet of the new product catalog. The spreadsheet is saved on an EFS file system created in us-east-1 region. The sourcing team counterparts from other AWS regions such as Asia Pacific and Europe also want to collaborate on this spreadsheet.
+		\item As a solutions architect, what is your recommendation to enable this collaboration with the LEAST amount of operational overhead?
+	\end{itemize}
+	\item Answer: The spreadsheet on the EFS file system can be accessed in other AWS regions by using an inter-region VPC peering connection
+	\item You can connect to Amazon EFS file systems from EC2 instances in other AWS regions using an inter-region VPC peering connection, and from on-premises servers using an AWS VPN connection. 
+\end{itemize}
+
+\subsection{Question 46}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item The solo founder at a tech startup has just created a brand new AWS account. The founder has provisioned an EC2 instance 1A which is running in region A. Later, he takes a snapshot of the instance 1A and then creates a new AMI in region A from this snapshot. This AMI is then copied into another region B. The founder provisions an instance 1B in region B using this new AMI in region B.
+		\item At this point in time, what entities exist in region B?
+	\end{itemize}
+	\item Answer: 1 EC2 instance, 1 AMI and 1 snapshot exist in region B
+	\item When the new AMI is copied from region A into region B, it automatically creates a snapshot in region B because AMIs are based on the underlying snapshots.
+\end{itemize}
+
+\subsection{Question 49}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A company has moved its business critical data to Amazon EFS file system which will be accessed by multiple EC2 instances.
+		\item As an AWS Certified Solutions Architect Associate, which of the following would you recommend to exercise access control such that only the permitted EC2 instances can read from the EFS file system? (Select three)
+	\end{itemize}
+	\item Answer: Use VPC security groups to control the network traffic to and from your file system
+	\item Attach an IAM policy to your file system to control clients who can mount your file system with the required permissions
+	\item Use EFS Access Points to manage application access
+\end{itemize}
+
+\subsection{Question 53}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A gaming company is looking at improving the availability and performance of its global flagship application which utilizes UDP protocol and needs to support fast regional failover in case an AWS Region goes down. The company wants to continue using its own custom DNS service.
+		\item Which of the following AWS services represents the best solution for this use-case?
+	\end{itemize}
+	\item Answer: AWS Global Accelerator
+	\item AWS Global Accelerator utilizes the Amazon global network, allowing you to improve the performance of your applications by lowering first-byte latency (the round trip time for a packet to go from a client to your endpoint and back again) and jitter (the variation of latency), and increasing throughput (the amount of time it takes to transfer data) as compared to the public internet.
+\end{itemize}
+
+\subsection{Question 55}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A company wants some EBS volumes with maximum possible Provisioned IOPS (PIOPS) to support high-performance database workloads on EC2 instances. The company also wants some EBS volumes that can be attached to multiple EC2 instances in the same Availability Zone.
+		\item As an AWS Certified Solutions Architect Associate, which of the following options would you identify as correct for the given requirements? (Select two)
+	\end{itemize}
+	\item Answer: Use io2 Block Express volumes on Nitro-based EC2 instances to achieve a maximum Provisioned IOPS of 256,000
+	\item Use io1/io2 volumes to enable Multi-Attach on Nitro-based EC2 instances
+	\item Amazon EBS Multi-Attach enables you to attach a single Provisioned IOPS SSD (io1 or io2) volume to multiple instances that are in the same Availability Zone.
+\end{itemize}
+
+\subsection{Question 56}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item The university uses High Performance Computing (HPC) driven application architecture to identify these landing sites.
+		\item Which of the following EC2 instance topologies should this application be deployed on?
+	\end{itemize}
+	\item Answer: The EC2 instances should be deployed in a cluster placement group so that the underlying workload can benefit from low network latency and high network throughput
+	\item Cluster placement groups pack instances close together inside an Availability Zone. These are recommended for applications that benefit from low network latency, high network throughput, or both. Therefore this option is the correct answer.
+\end{itemize}
+
+\subsection{Question 57}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A leading carmaker would like to build a new car-as-a-sensor service by leveraging fully serverless components that are provisioned and managed automatically by AWS. The development team at the carmaker does not want an option that requires the capacity to be manually provisioned, as it does not want to respond manually to changing volumes of sensor data.
+		\item Given these constraints, which of the following solutions is the BEST fit to develop this car-as-a-sensor service?
+	\end{itemize}
+	\item Answer: Ingest the sensor data in an Amazon SQS standard queue, which is polled by a Lambda function in batches and the data is written into an auto-scaled DynamoDB table for downstream processing
+\end{itemize}
+
+\subsection{Question 58}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A telecom company operates thousands of hardware devices like switches, routers, cables, etc. The real-time status data for these devices must be fed into a communications application for notifications. Simultaneously, another analytics application needs to read the same real-time status data and analyze all the connecting lines that may go down because of any device failures.
+		\item As a Solutions Architect, which of the following solutions would you suggest, so that both the applications can consume the real-time status data concurrently?
+	\end{itemize}
+	\item Answer: Amazon Kinesis Data Streams
+	\item AWS recommends Amazon Kinesis Data Streams for use cases with requirements that are similar to the following:
+	\begin{itemize}
+		\item Routing related records to the same record processor (as in streaming MapReduce). For example, counting and aggregation are simpler when all records for a given key are routed to the same record processor.
+		\item Ordering of records. For example, you want to transfer log data from the application host to the processing/archival host while maintaining the order of log statements.
+		\item Ability for multiple applications to consume the same stream concurrently. For example, you have one application that updates a real-time dashboard and another that archives data to Amazon Redshift. You want both applications to consume data from the same stream concurrently and independently.
+		\item Ability to consume records in the same order a few hours later. For example, you have a billing application and an audit application that runs a few hours behind the billing application. Because Amazon Kinesis Data Streams stores data for up to 7 days, you can run the audit application up to 7 days behind the billing application.
+	\end{itemize}
+\end{itemize}
+
+\subsection{Question 59}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A gaming company is developing a mobile game that streams score updates to a backend processor and then publishes results on a leaderboard. The company has hired you as an AWS Certified Solutions Architect Associate to design a solution that can handle major traffic spikes, process the mobile game updates in the order of receipt, and store the processed updates in a highly available database. The company wants to minimize the management overhead required to maintain the solution.
+		\item Which of the following will you recommend to meet these requirements?
+	\end{itemize}
+	\item Answer: Push score updates to Kinesis Data Streams which uses a Lambda function to process these updates and then store these processed updates in DynamoDB
+	\item To help ingest real-time data or streaming data at large scales, you can use Amazon Kinesis Data Streams (KDS). KDS can continuously capture gigabytes of data per second from hundreds of thousands of sources. The data collected is available in milliseconds, enabling real-time analytics. KDS provides ordering of records, as well as the ability to read and/or replay records in the same order to multiple Amazon Kinesis Applications.
+	\item Lambda integrates natively with Kinesis Data Streams. The polling, checkpointing, and error handling complexities are abstracted when you use this native integration. The processed data can then be configured to be saved in DynamoDB.
+\end{itemize}
+
+\subsection{Question 64}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A company manages a multi-tier social media application that runs on EC2 instances behind an Application Load Balancer. 
+		\item The instances run in an EC2 Auto Scaling group across multiple Availability Zones and use an Amazon Aurora database. 
+		\item As a solutions architect, you have been tasked to make the application more resilient to periodic spikes in request rates.
+		\item Which of the following solutions would you recommend for the given use-case? (Select two)
+	\end{itemize}
+	\item Answer: Use Aurora Replica
+	\item You can issue queries to them to scale the read operations for your application. 
+	\item Aurora Replicas also help to increase availability. If the writer instance in a cluster becomes unavailable, Aurora automatically promotes one of the reader instances to take its place as the new writer.
+	\item Answer: Use CloudFront distribution in front of the Application Load Balancer
+	\item Amazon CloudFront is a fast content delivery network (CDN) service that securely delivers data, videos, applications, and APIs to customers globally with low latency, high transfer speeds, all within a developer-friendly environment.
+	\item CloudFront points of presence (POPs) (edge locations) make sure that popular content can be served quickly to your viewers. 
+	\item CloudFront also has regional edge caches that bring more of your content closer to your viewers, even when the content is not popular enough to stay at a POP, to help improve performance for that content.
+	\item CloudFront offers an origin failover feature to help support your data resiliency needs. 
+\end{itemize}
+
+\section{Specific things to keep in mind}
+\begin{itemize}
+	\item Multi-AZ follows synchronous replication and spans at least two Availability Zones within a single region. Read replicas follow asynchronous replication and can be within an Availability Zone, Cross-AZ, or Cross-Region
+	\item Amazon Kinesis Data Firehose is the easiest way to load streaming data into data stores and analytics tools. It can capture, transform, and load streaming data into Amazon S3, Amazon Redshift, Amazon Elasticsearch Service, and Splunk, enabling near real-time analytics with existing business intelligence tools and dashboards you’re already using today. 
+	\item DynamoDB Accelerator (DAX) is a fully managed, highly available, in-memory cache for Amazon DynamoDB that delivers up to a 10 times performance improvement—from milliseconds to microseconds—even at millions of requests per second.
+	\item Snowball Edge Storage Optimized is the optimal choice if you need to securely and quickly transfer dozens of terabytes to petabytes of data to AWS. 
+	\item AWS Site-to-Site VPN enables you to securely connect your on-premises network or branch office site to your Amazon Virtual Private Cloud (Amazon VPC). 
+	\item Amazon FSx for Windows File Server provides fully managed, highly reliable file storage that is accessible over the industry-standard Service Message Block (SMB) protocol. 
+	\item ECS with EC2 launch type is charged based on EC2 instances and EBS volumes used. ECS with Fargate launch type is charged based on vCPU and memory resources that the containerized application requests
+	\item To prevent your API from being overwhelmed by too many requests, Amazon API Gateway throttles requests to your API using the token bucket algorithm, where a token counts for a request.
+	\item Amazon SQS - Amazon Simple Queue Service (SQS) is a fully managed message queuing service that enables you to decouple and scale microservices, distributed systems, and serverless applications. Amazon SQS offers buffer capabilities to smooth out temporary volume spikes without losing messages or increasing latency.
+	\item Amazon Kinesis - Amazon Kinesis is a fully managed, scalable service that can ingest, buffer, and process streaming data in real-time.
+	\item The Load Balancer generates the HTTP 503: Service unavailable error when the target groups for the load balancer have no registered targets.
+	\item Amazon Aurora Global Database is designed for globally distributed applications, allowing a single Amazon Aurora database to span multiple AWS regions.
+	\item API Gateway supports stateless RESTful APIs as well as stateful WebSocket APIs.
+	\item Scheduled scaling allows you to set your own scaling schedule. 
+	\item A permissions boundary can be used to control the maximum permissions employees can grant to the IAM principals (that is, users and roles) that they create and manage.
+	\item Versioning is a means of keeping multiple variants of an object in the same bucket. You can use versioning to preserve, retrieve, and restore every version of every object stored in your Amazon S3 bucket. Versioning-enabled buckets enable you to recover objects from accidental deletion or overwrite.
+	\item S3 Standard-IA storage class is for data that is accessed less frequently but requires rapid access when needed. 
+	\item There are no S3 data transfer charges when data is transferred in from the internet. Also with S3TA, you pay only for transfers that are accelerated. 
+	\item Amazon GuardDuty offers threat detection that enables you to continuously monitor and protect your AWS accounts, workloads, and data stored in Amazon S3.
+	\item Amazon Inspector security assessments help you check for unintended network accessibility of your Amazon EC2 instances and for vulnerabilities on those EC2 instances. 
+	\item Once you version-enable a bucket, it can never return to an unversioned state. Versioning can only be suspended once it has been enabled.
+	\item When you create a target group, you specify its target type, which can be an Instance, IP or a Lambda function.
+	\item For Amazon Aurora, each Read Replica is associated with a priority tier (0-15). In the event of a failover, Amazon Aurora will promote the Read Replica that has the highest priority (the lowest numbered tier). If two or more Aurora Replicas share the same priority, then Amazon RDS promotes the replica that is largest in size. If two or more Aurora Replicas share the same priority and size, then Amazon Aurora promotes an arbitrary replica in the same promotion tier.
+\end{itemize}
+
+\end{document}
