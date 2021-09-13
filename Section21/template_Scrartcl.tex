@@ -1,0 +1,127 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{Databases in AWS}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{Choosing the right database}
+\begin{itemize}
+	\item Based on architecture
+	\begin{itemize}
+		\item Read-heavy, write-heavy, or balanced workload?
+		\item Throughput needs
+		\item How much data to store and for how long? Will it grow?
+		\item Data durability?
+		\item Latency rqts
+		\item Schema type?
+	\end{itemize}
+	\item Database types
+	\begin{itemize}
+		\item RDBMS (SQL/OLTP): RDS, Aurora - great for joins
+		\item NoSQL: DynamoDB (JSON), ElastiCache (k/v pairs), Neptune (graph) - no SQL
+		\item Object store: S3 for big objects, Glacier for backups/archives
+		\item Data Warehouse (SQL Analytics): Redshift, Athena
+		\item Search: Elastisearch  - free text, unstructured searches
+		\item Graphs: Neptune - displays relationships between data
+	\end{itemize}
+\end{itemize}
+
+\section{RDS}
+\begin{itemize}
+	\item Managed SQL/NoSQL server
+	\item Must provision EC2 and EBS behind the scenes
+	\item Security thru IAM/SGs/KMS
+	\item Backup and snapshots
+	\item Monitoring thru Cloudwatch
+	\item Use case: store relational datasets
+	\item Multi AZ feature
+\end{itemize}
+
+\section{Aurora}
+\begin{itemize}
+	\item Auto healing capability
+	\item Can be global for DR/latency purposes
+	\item Define EC2 instance for an instance
+	\item Aurora serverless for unpredictable/intermittent workloads
+	\item Like RDS with less maintence, more flexibility
+\end{itemize}
+
+\section{ElastiCache}
+\begin{itemize}
+	\item Managed Redis/Memcached
+	\item In-memory data store, sub-milisecond latency
+	\item Must provision an EC2 instance
+	\item Support for Clustering and sharding
+	\item Maximum amount of replication and auto scaling capability
+	\item Use cases: key/value store, frequent reads/less writes, store session data for websites
+\end{itemize}
+
+\section{DynamoDB}
+\begin{itemize}
+	\item Managed NoSQL db
+	\item Serverless provisioned capacity, auto scaling
+	\item Could replace ElastiCache as a k/v store
+	\item reads can be eventually or strongly consistent
+	\item can only query on primary/sort key or indexes
+\end{itemize}
+
+\section{S3}
+\begin{itemize}
+	\item A key/value store for objects
+	\item Great for big objects
+	\item Serverless, scales infinitely, max object size is 5 TB
+\end{itemize}
+
+\section{Athena}
+\begin{itemize}
+	\item Provides a query engine on top of S3 with SQL capabilities
+	\item Query data in S3, output results back to S3
+	\item use Cases: one time SQL queries, serverless queries
+	\item Uses presto
+\end{itemize}
+
+\section{Redshift}
+\begin{itemize}
+	\item Based on postgres, not used for OLTP
+	\item OLAP - online analytical processing (analytics and data warehousing)
+	\item Columnar storage of data, massive parallel query execution
+	\item Data is loaded from S3/DynamoDB
+	\item Leader node, compute node
+	\item No multi-AZ mode, snapshots are stored in S3, can restore a snapshot into a new cluster
+	\item Loading data into Redshift
+	\begin{itemize}
+		\item Amazon Kinesis, Data Firehouse
+		\item S3 using COPY command
+		\item EC2 instance via JDBC driver
+	\end{itemize}
+	\item Redshift spectrum: query data that is already in S3 without loading it. Query is submitted to thousands of redshift spectrum nodes
+	\item Faster than Athena because of indexes
+\end{itemize}
+
+\section{Glue}
+\begin{itemize}
+	\item Managed ETL service, useful to prepare and transform data for analytics, fully serverless
+	\item Glue Data Catalog - catalog of datasets
+	\item Glue Data Crawler will crawl thru your datasets, writes metadata to the catalog, and then used by glue jobs
+\end{itemize}
+
+\section{Neptune}
+\begin{itemize}
+	\item Fully managed graph database
+	\item High relationship data (EX: social networking or knowledge graphs)
+\end{itemize}
+
+\section{ElasticSearch}
+\begin{itemize}
+	\item EX: in DynamoDB you can only find data via primary key or indexes
+	\item You can search any field, even partial matches
+	\item good compliment to DynamoDB or other DBs
+	\item Provision a cluster of instances and has built in integrations to other services
+	\item ELK Stack: ElasticSearch, Kibana, and Logstash
+\end{itemize}
+
+\end{document}
