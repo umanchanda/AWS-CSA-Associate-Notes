@@ -1,0 +1,271 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{Decoupling Applications: SQS, SNS, Kinesis, Active MQ}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{Intro to Messaging}
+\begin{itemize}
+	\item Two patterns of application communication
+	\begin{itemize}
+		\item Synchronous communications: application to application. Can be problematic if there are sudden spikes in traffic. Best to decouple your applications
+		\item Asynchronous/event based communications: application to queue to application
+	\end{itemize}
+\end{itemize}
+
+\section{SQS}
+\subsection{Introduction}
+\begin{itemize}
+	\item Simple queuing service
+	\item producer sends message to SQS queue
+	\item consumers will poll the messages from the queue, process message, and delete from queue
+\end{itemize}
+
+\subsection{Standard Queue}
+\begin{itemize}
+	\item fully managed service, used to decouple applications
+	\item unlimited throughput, unlimited msgs in queue
+	\item default retention: 4 days, max 14 days
+	\item low latency, at most 256 kb/msg sent
+	\item can have duplicate messages (at least once delivery, occasionally)
+	\item can have out of out of order messages (best effort ordering)
+	\item Producing Messages
+	\begin{itemize}
+		\item using the SDK (SendMessage API)
+		\item message is persisted in SQS until a consumer deletes it
+		\item EX: send order to be processed
+	\end{itemize}
+	\item Consuming Messages
+	\begin{itemize}
+		\item running on EC2 instances, servers, lambda, etc
+		\item polls SQS for messages (receives up to 10 at a time)
+		\item process the messages (EX: insert msg into RDS db)
+		\item Delete msg
+	\end{itemize}
+	\item Multiple EC2 instances consumers
+	\begin{itemize}
+		\item consumers receive and process messages in parallel
+		\item can scale consumers horizontally to improve throughput of processing
+	\end{itemize}
+	\item SQS w/ ASG
+	\begin{itemize}
+		\item consumers are running on EC2 instances inside ASG
+		\item SQS polls for messages
+		\item ASG needs to scale on some kind of metric - Queue length (CW metric), ApproximateNumberOfMessages
+		\item Set up CW alarm to check if that metric is breached, will then tell ASG to scale up
+	\end{itemize}
+	\item SQS to decouple between application tiers
+	\begin{itemize}
+		\item EX: app that processes videos
+		\item request to process a file is done by sending message to SQS queue
+		\item Actual video processing done by separate application which receives messages from SQS queue
+		\item videos are then inserted into S3 bucket
+	\end{itemize}
+	\item Security
+	\begin{itemize}
+		\item in flight encryption using HTTPS, at rest via KMS keys
+		\item access controls: IAM policies
+		\item SQS access policies (similar to S3 bucket policies): useful for cross acct access to SQS queues, for allowing other services (SNS,S3,etc) to write to an SQS queue
+	\end{itemize}
+\end{itemize}
+
+\subsection{SQS Queue Access Policy}
+\begin{itemize}
+	\item Cross Account Access
+	\item Publish S3 Event notifications to SQS queue
+	\begin{itemize}
+		\item upload object to s3 bucket
+		\item send msg to SQS queue
+	\end{itemize}
+\end{itemize}
+
+\subsection{Message Visibility Timeout}
+\begin{itemize}
+	\item After a msg is polled by a consumer, it becomes invisible to other consumers
+	\item by default, a message visibility timeout is 30 seconds. Means the message has 30 seconds to be processed
+\end{itemize}
+
+\subsection{Dead Letter Queue}
+\begin{itemize}
+	\item EX: if a consumer fails to process a msg within the visibility timeout the msg goes back to the queue
+	\item we can set a threshold of how many times a msg can go back into the queue
+	\item if the MaximumREceives threshold is breached, the msg goes into a dead letter queue
+	\item Msgs in DLQ will eventually expire
+\end{itemize}
+
+\subsection{Request-Response Systems}
+\begin{itemize}
+	\item Requesters (eg multiple producers) send requests into a request queue
+	\item Decouple requester from the responses, you can scale your amount of requests and response this way
+	\item Responders sit in an ASG
+	\item SQS temporary queue client, leverages virtual queues
+\end{itemize}
+
+\subsection{Delay Queue}
+\begin{itemize}
+	\item delay a message up to 15 minutes (default is 0)
+	\item useful if you want to send a per-message delay for every single message
+\end{itemize}
+
+\subsection{FIFO Queue}
+\begin{itemize}
+	\item First in first out, for ordering of messages in the queue
+	\item consumers will poll messages in the same order in which the queue received them
+	\item limited throughput
+\end{itemize}
+
+\subsection{SQS + ASG}
+\begin{itemize}
+	\item ASG with multiple EC2 instances polling for messages from SQS
+	\item eg: more load in queue so more capacity to ec2 instances
+	\item uses CW custom metric, if that metric is breached, it triggers a CW alarm, which tells the ASG to scale
+	\item useful for decoupling application tiers
+	\item EX:
+	\begin{itemize}
+		\item EC2 instances behind ASG+ALB receive lots of requests
+		\item put requests into SQS which is infinitely scalable
+		\item Have another ASG behind the queue to poll for messages
+		\item that ASG can scale if necessary
+	\end{itemize}
+\end{itemize}
+
+\section{SNS}
+\begin{itemize}
+	\item Send one message to many receivers
+	\item pub sub: publish subscribe
+	\item EX: service publishes messages to SNS topic, SNS topic subscribes to several subscribers
+	\item Only one event producer, but many event subscribers
+	\item Each subscriber will get all messages published
+	\item create topic, create subscription, publish to topic
+\end{itemize}
+
+\subsection{SNS+SQS Fan out pattern}
+\begin{itemize}
+	\item EX: want to send a message to multiple SQS queues, can be risky
+	\item with fan out pattern you push once in SNS topic and then subscribe as many SQS queues as you want to the SNS topic
+	\item fully decoupled, easy to add more SQS queues
+	\item EX: S3 events to multiple queries: use fan out
+	\item SNS FIFO
+	\begin{itemize}
+		\item Similar to SQS FIFO
+		\item if you want to do fan out + ordering + deduplication for example
+	\end{itemize}
+	\item Can do message filtering via JSON
+\end{itemize}
+
+\section{Kinesis}
+\begin{itemize}
+	\item Makes it easy to collect, process, and analyze streaming data in real time
+	\item Kinesis data streams: capture, process, and store data streams
+	\item Kinesis data firehose: load data streams into AWS data stores
+	\item Kinesis data analytics: analyze data streams with SQL or Apache FLink
+	\item Kinesis video streams: capture, process, and store video streams
+\end{itemize}
+
+\subsection{Kinesis Data Streams}
+\begin{itemize}
+	\item Streams are made of shards which are numbered
+	\item More shards = more throughput
+	\item Producers send a record (w/ partition key and data) to a kinesis data stream
+	\item Producer might be kinesis producer library or kinesis agent
+	\item Consumers receive records (same partition key, sequence number, and data) from a data stream.
+	\item Consumer might be kinesis data firehose or kinesis data analytics
+	\item Able to reprocess (replay) data
+	\item Data is immutable (cannot be deleted)
+	\item Data that shares the same partition goes to the same shard (ordering)
+\end{itemize}
+
+\subsection{Kinesis Data Firehose}
+\begin{itemize}
+	\item store data in target destinations
+	\item Most common is to read records from kinesis data streams
+	\item Could transform the record via lambda
+	\item Then fill a big batch of data to write that data into a target db/dest
+	\item most common destinations: s3, redshift (copy through S3), or elasticsearch
+	\item could send all or failed data to an s3 backup bucket
+	\item fully managed, serverless, near real time
+\end{itemize}
+
+\subsubsection{Kinesis Data Streams vs Firehose}
+\begin{itemize}
+	\item Data Streams
+	\begin{itemize}
+		\item Streaming service
+		\item Write custom code to send/consume data
+		\item real time
+		\item manage scaling
+	\end{itemize}
+	\item Data Firehose
+	\begin{itemize}
+		\item Load streaming data
+		\item fully managd, near real time
+	\end{itemize}
+\end{itemize}
+
+\subsection{Kinesis Data Analytics}
+\begin{itemize}
+	\item SQL Application
+	\item Read from sources usually kinesis data streams or kinesis data firehose
+	\item write your own sql statements to process data in real time
+	\item send result to: kinesis data streams or data firehose
+	\item send data to kinesis data stream for your own application
+	\item fully managed, serverless
+	\item can create streams out of the queries
+	\item use cases: time series analytics, real time dashboards, real time metrics
+\end{itemize}
+
+\section{Data Ordering for Kinesis vs SQS FIFO}
+\begin{itemize}
+	\item Ordering data for Kinesis
+	\begin{itemize}
+		\item use partition key
+		\item Data ordered within each shard
+		\item Better for lots of data that needs to be sent and want to have data ordering per shard
+	\end{itemize}
+	\item For SQS: SQS FIFO
+	\begin{itemize}
+		\item If you don't use a group id, msgs are consumed in the order they are sent with only one consumer
+		\item EX: you want to scale the number of consumers but want messages to be grouped when they are related: use group id
+		\item better if you want to have a dynamic number of consumers based on group IDs
+	\end{itemize}
+\end{itemize}
+
+\section{SQS vs SNS vs Kinesis}
+\begin{itemize}
+	\item SQS
+	\begin{itemize}
+		\item consumer pull data
+		\item data is deleted after being consumed
+		\item can have as many workers as we want
+		\item ordering is only guaranteed in a FIFO queue
+		\item no need to provision throughput
+	\end{itemize}
+	\item SNS
+	\begin{itemize}
+		\item push data to many subscribers
+		\item data is not persisted
+		\item pub/sub
+		\item no need to provision throughput
+	\end{itemize}
+	\item Kinesis
+	\begin{itemize}
+		\item Standard: pull data
+		\item Enhanced-fan out: push data
+		\item Possibility to replay data
+		\item ordering at shard level
+		\item need to provision throughput
+	\end{itemize}
+\end{itemize}
+
+\section{MQ}
+\begin{itemize}
+	\item SQS/SNS are AWS specific
+	\item Managed apache activeMQ
+	\item useful if you want to migrate to the cloud without re-architecting
+\end{itemize}
+
+\end{document}
