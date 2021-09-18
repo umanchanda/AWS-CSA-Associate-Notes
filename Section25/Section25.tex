@@ -1,0 +1,219 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{Networking - VPC}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{CIDR, Private vs Public IP}
+\begin{itemize}
+	\item CIDR - classless inter-domain routing
+	\item Used for SG rules or networking in general
+	\item Define an IP address range. EX: 0.0.0.0/0 = all ip addresses
+	\item Two components: base ip (xx.xx.xx.xx) and subnet mask (/y)
+	\item base ip represents an ip contained in the range
+	\item subnet masks defines how many bits can change in the IP
+\end{itemize}
+
+\subsection{Subnet Masks}
+\begin{itemize}
+	\item allows part of the underlying IP to get additional next values from the base IP
+	\item /32 allows for 1 IP = $2^0$
+	\item /31 allows for 2 IP = $2^1$
+	\item /30 = 4 IP = $2^2$
+	\item /29 = 8, /28 = 16, /16 = 65,536
+	\item /y = $2^{32-y}$
+	\item /32 = no IP can change, /24 = last IP number can change, /16 = last two IP numbers can change, etc
+	\item 192.168.0.0/24 = 192.168.0.0 - 192.168.0.255
+	\item 192.168.0.0/16 = 192.168.0.0 - 192.168.255.255
+	\item 134.56.78.123/32 = 134.56.78.123
+	\item Private IP ranges: 10.0.0.0/8 (big networks), 172.16.0.0/12 (default AWS), 192.168.0.0/16 (home networks) 
+\end{itemize}
+
+\section{VPC}
+\begin{itemize}
+	\item VPC = virtual private cloud
+	\item Can have multiple VPCs in a region (max 5)
+	\item Max CIDR per VPC is 5. For each CIDR:
+	\begin{itemize}
+		\item Min size is /28 = 16 IPs
+		\item Max is /16 = 65526 IPs
+	\end{itemize}
+	\item Since the VPC is private, only the private IP ranges are allowed
+\end{itemize}
+
+\subsection{Default VPC}
+\begin{itemize}
+	\item All new accounts have a default VPC
+	\item New instances are launched into the default VPC if no subnet is specified
+	\item Default VPC have internet connectivity and all instances have a public IP
+	\item Also get public and private DNS name
+\end{itemize}
+
+\subsection{VPC Peering}
+\begin{itemize}
+	\item connect 2 VPCs privately using the AWS network
+	\item makes them behave as if they were in the same network
+	\item must not have overlapping CIDR
+	\item is not transitive. if A and B are connected, and B and C are connected, A and C are not connected
+	\item can do vpc peering with another aws account
+	\item must update route tables in each VPCs subnets to ensure instances can communicate
+	\item can reference a SG of a peered VPC (for cross account)
+\end{itemize}
+
+\subsection{VPC Endpoints}
+\begin{itemize}
+	\item meant for you to access AWS services within a private network
+	\item via a NACL
+	\item no need to setup all the infrastructure
+	\item two types of endpoints
+	\begin{itemize}
+		\item interface: provisions an ENI as an entry point - most AWS services
+		\item gateway: provisions a target and must be used in a route table (S3, DynamoDB)
+	\end{itemize}
+	\item if there are issues: check DNS setting resolution in VPC or check route tables
+\end{itemize}
+
+\subsection{VPC Flow Logs}
+\begin{itemize}
+	\item help you capture information about ip traffic going to your interfaces
+	\item VPC flow logs, subnet flow logs, and ENI flow logs
+	\item data can go to S3/CW logs
+\end{itemize}
+
+\section{Subnet}
+\begin{itemize}
+	\item tied to specific AZs
+	\item 5 IPs are reserved in each subnet (first 4 and last one)
+	\item If you need 29 IP addresses for EC2 instances you can't choose a subnet size of /27 (32 IP) since 5 IPs are reserved
+	\item Need at least 64 IPs, so go for /26
+\end{itemize}
+
+\section{Internet Gateways and Route Tables}
+\begin{itemize}
+	\item Help our VPC instances connect with the internet
+	\item created separately from VPC
+	\item One VPC can only be attached to one IGW and vice versa
+	\item also a NAT for the instances that have a public ipv4
+	\item do not allow internet access on their own, must edit route tables
+	\item if you want an ec2 to have access to the internet
+	\begin{itemize}
+		\item edit route table to point to the gateway for a specific IP range
+		\item ec2 will then get routed directly into the gateway
+	\end{itemize}
+\end{itemize}
+
+\section{NAT Instances}
+\begin{itemize}
+	\item allows instances in the private subnets to connect to the internet
+	\item network address translation
+	\item must be launched in a public subnet
+	\item must have elastic IP attached
+	\item route table must be configured to route traffic from private subnets to NAT instance
+\end{itemize}
+
+\section{NAT Gateways}
+\begin{itemize}
+	\item AWS managed NAT, higher bandwidth, better availability, no administration
+	\item created in a specific AZ, cannot be used by an instance in that subnet (only from other subnets)
+	\item requires IGW
+	\item no need to manage SG
+\end{itemize}
+
+\subsection{NAT Gateway with High Availability}
+\begin{itemize}
+	\item resilient within a single AZ
+	\item must create multiple NAT Gateways in multiple AZs for fault tolerance
+	\item no cross AZ failover needed because if a AZ goes down it doesn't need NAT
+\end{itemize}
+
+\section{DNS Resolution Options and R53 Private Zones}
+\begin{itemize}
+	\item DNS resolution in VPC
+	\begin{itemize}
+		\item enableDnsSupport - default true
+		\item enableDnsHostname - default false
+	\end{itemize}
+	\item if you use custom DNS domain names in a private zone in r53, you must set both these attributes to true
+\end{itemize}
+
+\section{NACL and Security Groups}
+\begin{itemize}
+	\item NACL = network access control list (subnet level)
+	\item incoming requests are first evalulated by the NACL inbound rules and then the SG inbound rules
+	\item SGs are stateful. so if an inbound rule allows traffic the outbound does as well.
+	\item NACLs are stateless. so if an inbound rule allows traffic the outbound does not necessarily. 
+	\item outgoing requests are first evaluated by the outbound rule on the SG and then the outbound rule on the NACL
+	\item they're like a firewall which control traffic from and to subnet
+	\item default nacl allows everything inbound and outbound
+	\item one nacl per subnet, new subnets are assigned default nacl
+	\item nacl rules have a number, higher precedence have lower numbers. 
+\end{itemize}
+
+\section{Bastion Hosts}
+\begin{itemize}
+	\item Use to SSH into private instances
+	\item bastion is in the public subnet which is then connected to all other private subnets
+	\item bastion host should only have port 22 traffic from the IP you need
+\end{itemize}
+
+\section{Site to Site VPN}
+\begin{itemize}
+	\item used if you have a corporate data center
+	\item customer gateway on the corporate data center side
+	\item vpn gateway on the vpc side
+	\item site to site vpn links the two
+\end{itemize}
+
+\subsection{Virtual Private Gateway}
+\begin{itemize}
+	\item VPN concentrator on the AWS side of the VPN connection
+	\item VGW (virtual private gateway) is created and attached to the VPC from which you want to create the site to site VPN
+\end{itemize}
+
+\subsection{Customer Gateway}
+\begin{itemize}
+	\item IP address:
+	\begin{itemize}
+		\item use static, internet-routable IP address for you customer gateway device
+		\item if behind a NAT (with NAT-T), use the public IP of the NAT
+	\end{itemize}
+\end{itemize}
+
+\section{Direct Connect and Direct Connect Gateway}
+\begin{itemize}
+	\item DX provides a dedicated private connection from a remote network to your VPC
+	\item dedicated connection must be setup between your DC and AWS DX locations
+	\item Set up Virtual private gateway on VPC
+	\item use direct connect gateway to connect to one or more VPCs in different regions (same acct)
+	\item Connection types
+	\begin{itemize}
+		\item Dedicated connections - physical ethernet port dedicated to customer, connection requests are made to AWS first and completed by AWS DX partners
+		\item Hosted Connections - connection requests are made via AWS DX partners
+	\end{itemize}
+\end{itemize}
+
+\section{Egress Only Internet Gateway}
+\begin{itemize}
+	\item egress = outgoing
+	\item similar to NAT but for ipv6
+	\item all ipv6 addresses are public
+	\item gives ipv6 instances access to internet but won't be directly reachable by the internet
+\end{itemize}
+
+\section{AWS Private Link}
+\begin{itemize}
+	\item aka vpc endpoint services
+	\item expose services in your VPC to other VPCs. most scalable and secure way
+\end{itemize}
+
+\section{Transit Gateway}
+\begin{itemize}
+	\item for having transitive peering between thousands of VPC and on-premises, hub and spoke (star) connection
+	\item no need to peer the VPCs individually
+\end{itemize}
+
+\end{document}
