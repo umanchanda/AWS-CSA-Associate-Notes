@@ -1,0 +1,507 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{Exam Two Notes}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{Questions I had no idea/got wrong}
+
+\subsection{Question 1}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item The development team at an e-commerce startup has set up multiple microservices running on EC2 instances under an Elastic Load Balancer. 
+		\item The team wants to route traffic to multiple back-end services based on the content of the request.
+		\item Which of the following types of load balancers would allow routing based on the content of the request?
+	\end{itemize}
+	\item Answer: Application Load Balancer
+\end{itemize}
+
+\subsection{Question 3}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A social media application is hosted on an EC2 server fleet running behind an Application Load Balancer. 
+		\item The application traffic is fronted by a CloudFront distribution. 
+		\item The engineering team wants to decouple the user authentication process for the application, so that the application servers can just focus on the business logic.
+		\item As a Solutions Architect, which of the following solutions would you recommend to the development team so that it requires minimal development effort?
+	\end{itemize}
+	\item Answer: Use Cognito Authentication via Cognito User Pools for your Application Load Balancer
+	\item You can use Cognito User Pools to authenticate users through well-known social IdPs, such as Amazon, Facebook, or Google, through the user pools supported by Amazon Cognito or through corporate identities, using SAML, LDAP, or Microsoft AD, through the user pools supported by Amazon Cognito.
+	\item With an identity pool, users can obtain temporary credentials
+\end{itemize}
+
+\subsection{Question 4}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A silicon valley based startup has a content management application with the web-tier running on EC2 instances and the database tier running on Amazon Aurora. 
+		\item Currently, the entire infrastructure is located in us-east-1 region. The startup has 90 percent of its customers in the US and Europe. 
+		\item The engineering team is getting reports of deteriorated application performance from customers in Europe with high application load time.
+		\item As a solutions architect, which of the following would you recommend addressing these performance issues? (Select two)
+	\end{itemize}
+	\item Answer: Setup another fleet of EC2 instances for the web tier in the eu-west-1 region. Enable latency routing policy in Route 53
+	\item se latency based routing when you have resources in multiple AWS Regions and you want to route traffic to the region that provides the lowest latency. 
+	\item Answer: Create Amazon Aurora read replicas in the eu-west-1 region 
+	\item Amazon Aurora read replicas can be used to scale out reads across regions
+\end{itemize}
+
+\subsection{Question 5}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A financial services company wants to implement a solution that ensures that the order of financial transactions is preserved and no duplicate transactions are created.
+	\end{itemize}
+	\item Answer: Publish transaction updates using SNS FIFO topic, which is subscribed by SQS FIFO queue for further processing
+	\item Per the use-case, the financial transactions have to be processed and stored in the exact order they take place. So SNS FIFO is the right choice, subscribed b SQS FIFO.
+	\item Similar capabilities for pub/sub messaging is achieved through SNS FIFO topics, providing strict message ordering and deduplicated message delivery to one or more subscribers.
+\end{itemize}
+
+\subsection{Question 6}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item To improve the performance and security of the application, the engineering team at a company has created a CloudFront distribution with an Application Load Balancer as the custom origin. 
+		\item The team has also set up a Web Application Firewall (WAF) with CloudFront distribution. 
+		\item The security team at the company has noticed a surge in malicious attacks from a specific IP address to steal sensitive data stored on the EC2 instances.
+		\item As a solutions architect, which of the following actions would you recommend to stop the attacks?
+	\end{itemize}
+	\item Answer: Create an IP match condition in the WAF to block the malicious IP address
+\end{itemize}
+
+\subsection{Question 7}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item Your company has a monthly big data workload, running for about 2 hours, which can be efficiently distributed across multiple servers of various sizes, with a variable number of CPUs. 
+		\item The solution for the workload should be able to withstand server failures.
+		\item Which is the MOST cost-optimal solution for this workload?
+	\end{itemize}
+	\item Answer: Run the workload on a Spot Fleet
+	\item The Spot Fleet selects the Spot Instance pools that meet your needs and launches Spot Instances to meet the target capacity for the fleet. By default, Spot Fleets are set to maintain target capacity by launching replacement instances after Spot Instances in the fleet are terminated.
+	\item A Spot Instance is an unused EC2 instance that is available for less than the On-Demand price. 
+\end{itemize}
+
+\subsection{Question 8}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A tax computation software runs on Amazon EC2 instances behind a Classic Load Balancer. The instances are managed by an Auto Scaling Group. The tax computation software has an optimization module, which can take up to 10 minutes to find the optimal answer.
+		\item How do you ensure that when the Auto Scaling Group initiates a scale-in event, the users do not see their current requests interrupted?
+	\end{itemize}
+	\item Answer: Increase the deregistration delay to more than 10 minutes
+	\item Elastic Load Balancing stops sending requests to targets that are deregistering. 
+\end{itemize}
+
+\subsection{Question 10}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An e-commerce company operates multiple AWS accounts and has interconnected these accounts in a hub-and-spoke style using the AWS Transit Gateway. VPCs have been provisioned across these AWS accounts to facilitate network isolation.
+		\item Which of the following solutions would reduce both the administrative overhead and the costs while providing shared access to services required by workloads in each of the VPCs?
+	\end{itemize}
+	\item Answer: Build a shared services VPC
+	\item When deploying distributed architectures such as this, a popular approach is to build a "shared services VPC, which provides access to services required by workloads in each of the VPCs.
+\end{itemize}
+
+\subsection{Question 12}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A company has recently launched a new mobile gaming application that the users are adopting rapidly. The company uses RDS MySQL as the database. The engineering team wants an urgent solution to this issue where the rapidly increasing workload might exceed the available database storage.
+		\item As a solutions architect, which of the following solutions would you recommend so that it requires minimum development and systems administration effort to address this requirement?
+	\end{itemize}
+	\item Answer: Enable storage auto-scaling for RDS MySQL
+	\item If your workload is unpredictable, you can enable storage autoscaling for an Amazon RDS DB instance. With storage autoscaling enabled, when Amazon RDS detects that you are running out of free database space it automatically scales up your storage. 
+\end{itemize}
+
+\subsection{Question 15}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item You have multiple AWS accounts within a single AWS Region managed by AWS Organizations and you would like to ensure all EC2 instances in all these accounts can communicate privately. 
+		\item Which of the following solutions provides the capability at the CHEAPEST cost?
+	\end{itemize}
+	\item Answer: Create a VPC in an account and share one or more of its subnets with the other accounts using Resource Access Manager
+	\item AWS Resource Access Manager (RAM) is a service that enables you to easily and securely share AWS resources with any AWS account or within your AWS Organization. 
+\end{itemize}
+
+\subsection{Question 16}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item The engineering team at a logistics company has noticed that the Auto Scaling group (ASG) is not terminating an unhealthy Amazon EC2 instance.
+		\item As a Solutions Architect, which of the following options would you suggest to troubleshoot the issue? (Select three)
+	\end{itemize}
+	\item Answer: The health check grace period for the instance has not expired
+	\item Amazon EC2 Auto Scaling doesn't terminate an instance that came into service based on EC2 status checks and ELB health checks until the health check grace period expires.
+	\item Answer: The instance maybe in Impaired status
+	\item Amazon EC2 Auto Scaling does not immediately terminate instances with an Impaired status.
+	\item Answer: The instance has failed the ELB health check status
+	\item By default, Amazon EC2 Auto Scaling doesn't use the results of ELB health checks to determine an instance's health status when the group's health check configuration is set to EC2. 
+\end{itemize}
+
+\subsection{Question 18}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A manufacturing company receives unreliable service from its data center provider because the company is located in an area prone to natural disasters. 
+		\item The company is not ready to fully migrate to the AWS Cloud, but it wants a failover environment on AWS in case the on-premises data center fails. 
+		\item The company runs web servers that connect to external vendors. The data available on AWS and on-premises must be uniform.
+		\item Which of the following solutions would have the LEAST amount of downtime?
+	\end{itemize}
+	\item Answer: Set up a Route 53 failover record. Run application servers on EC2 instances behind an Application Load Balancer in an Auto Scaling group. Set up AWS Storage Gateway with stored volumes to back up data to S3
+	\item If you have multiple resources that perform the same function, you can configure DNS failover so that Route 53 will route your traffic from an unhealthy resource to a healthy resource.
+	\item AWS Storage Gateway is a hybrid cloud storage service that gives you on-premises access to virtually unlimited cloud storage.
+\end{itemize}
+
+\subsection{Question 19}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A company is looking at storing their less frequently accessed files on AWS that can be concurrently accessed by hundreds of EC2 instances. The company needs the most cost-effective file storage service that provides immediate access to data whenever needed.
+		\item Which of the following options represents the best solution for the given requirements?
+	\end{itemize}
+	\item Answer: Amazon Elastic File System (EFS) Standard–IA storage class
+	\item The Standard–IA storage class reduces storage costs for files that are not accessed every day.
+\end{itemize}
+
+\subsection{Question 21}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An analytics company wants to improve the performance of its big data processing workflows running on Amazon EFS. Which of the following performance modes should be used for EFS to address this requirement?
+	\end{itemize}
+	\item Answer: Max I/O
+	\item Max I/O performance mode is used to scale to higher levels of aggregate throughput and operations per second.
+\end{itemize}
+
+\subsection{Question 23}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A Machine Learning research group uses a proprietary computer vision application hosted on an EC2 instance. 
+		\item Every time the instance needs to be stopped and started again, the application takes about 3 minutes to start as some auxiliary software programs need to be executed so that the application can function. 
+		\item The research group would like to minimize the application boostrap time whenever the system needs to be stopped and then started at a later point in time.
+		\item As a solutions architect, which of the following solutions would you recommend for this use-case?
+	\end{itemize}
+	\item Answer: Use EC2 Instance Hibernate
+	\item When you hibernate an instance, AWS signals the operating system to perform hibernation (suspend-to-disk). Hibernation saves the contents from the instance memory (RAM) to your Amazon EBS root volume. 
+\end{itemize}
+
+\subsection{Question 25}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An IT company has built a solution wherein a Redshift cluster writes data to an Amazon S3 bucket belonging to a different AWS account. 
+		\item However, it is found that the files created in the S3 bucket using the UNLOAD command from the Redshift cluster are not even accessible to the S3 bucket owner.
+		\item What could be the reason for this denial of permission for the bucket owner?
+	\end{itemize}
+	\item Answer: By default, an S3 object is owned by the AWS account that uploaded it. So the S3 bucket owner will not implicitly have access to the objects written by Redshift cluster 
+	\item This is true even when the bucket is owned by another account
+\end{itemize}
+
+\subsection{Question 26}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A weather forecast agency collects key weather metrics across multiple cities in the US and sends this data in the form of key-value pairs to AWS Cloud at a one-minute frequency.
+		\item As a solutions architect, which of the following AWS services would you use to build a solution for processing and then reliably storing this data with high availability? (Select two)
+	\end{itemize}
+	\item Answer: Lambda
+	\item Answer: DynamoDB
+\end{itemize}
+
+\subsection{Question 29}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A big-data consulting firm is working on a client engagement where the ETL workloads are currently handled via a Hadoop cluster deployed in the on-premises data center. 
+		\item The client wants to migrate their ETL workloads to AWS Cloud. The AWS Cloud solution needs to be highly available with about 50 EC2 instances per Availability Zone.
+		\item As a solutions architect, which of the following EC2 placement groups would you recommend handling the distributed ETL workload?
+	\end{itemize}
+	\item Answer: Partition placement group
+	\item You can use placement groups to influence the placement of a group of interdependent instances to meet the needs of your workload. 
+	\item Partition – spreads your instances across logical partitions such that groups of instances in one partition do not share the underlying hardware with groups of instances in different partitions. This strategy is typically used by large distributed and replicated workloads, such as Hadoop, Cassandra, and Kafka. Therefore, this is the correct option for the given use-case.
+\end{itemize}
+
+\subsection{Question 30}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A big data consulting firm needs to set up a data lake on Amazon S3 for a Health-Care client. The data lake is split in raw and refined zones. 
+		\item For compliance reasons, the source data needs to be kept for a minimum of 5 years. The source data arrives in the raw zone and is then processed via an AWS Glue based ETL job into the refined zone. 
+		\item The business analysts run ad-hoc queries only on the data in the refined zone using AWS Athena. The team is concerned about the cost of data storage in both the raw and refined zones as the data is increasing at a rate of 1TB daily in each zone.
+		\item As a solutions architect, which of the following would you recommend as the MOST cost-optimal solution? (Select two)
+	\end{itemize}
+	\item Answer: Setup a lifecycle policy to transition the raw zone data into Glacier Deep Archive after 1 day of object creation
+	\item You can manage your objects so that they are stored cost-effectively throughout their lifecycle by configuring their Amazon S3 Lifecycle. An S3 Lifecycle configuration is a set of rules that define actions that Amazon S3 applies to a group of objects. 
+	\item Answer: Use Glue ETL job to write the transformed data in the refined zone using a compressed file format
+	\item the best optimization is to have the refined zone data stored in a compressed format via the Glue job. The compressed data would reduce the storage cost incurred on the data in the refined zone.
+\end{itemize}
+
+\subsection{Question 32}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An IT company wants to optimize the costs incurred on its fleet of 100 EC2 instances for the next year. 
+		\item Based on historical analyses, the engineering team observed that 70 of these instances handle the compute services of its flagship application and need to be always available. 
+		\item The other 30 instances are used to handle batch jobs that can afford a delay in processing.
+		\item As a solutions architect, which of the following would you recommend as the MOST cost-optimal solution?
+	\end{itemize}
+	\item Answer: Purchase 70 reserved instances and 30 spot instances
+	\item As 70 instances need to be always available, these can be purchased as reserved instances for a one-year duration. The other 30 instances responsible for the batch job can be purchased as spot instances. 
+\end{itemize}
+
+\subsection{Question 34}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A financial services company wants a single log processing model for all the log files (consisting of system logs, application logs, database logs, etc) that can be processed in a serverless fashion and then durably stored for downstream analytics. 
+		\item The company wants to use an AWS managed service that automatically scales to match the throughput of the log data and requires no ongoing administration.
+		\item As a solutions architect, which of the following AWS services would you recommend solving this problem?
+	\end{itemize}
+	\item Answer: Kinesis Data Firehose
+	\item Amazon Kinesis Data Firehose is the easiest way to reliably load streaming data into data lakes, data stores, and analytics tools.
+	\item Amazon Kinesis Data Streams (KDS) is a massively scalable and durable real-time data streaming service. The throughput of an Amazon Kinesis data stream is designed to scale without limits via increasing the number of shards within a data stream. With Amazon Kinesis Data Streams, you can scale up to a sufficient number of shards (note, however, that you'll need to provision enough shards ahead of time). As it requires manual administration of shards, it's not the correct choice for the given use-case.
+	\item Amazon EMR is the industry-leading cloud big data platform for processing vast amounts of data using open source tools
+	\item Using an EMR cluster would imply managing the underlying infrastructure so it’s ruled out.
+\end{itemize}
+
+\subsection{Question 38}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An application is currently hosted on four EC2 instances (behind Application Load Balancer) deployed in a single Availability Zone (AZ). To maintain an acceptable level of end-user experience, the application needs at least 4 instances to be always available.
+		\item As a solutions architect, which of the following would you recommend so that the application achieves high availability with MINIMUM cost?
+	\end{itemize}
+	\item Answer: Deploy the instances in three Availability Zones. Launch two instances in each Availability Zone
+	\item The correct option is to deploy the instances in three Availability Zones and launch two instances in each Availability Zone. Even if one of the AZs goes out of service, still we shall have 4 instances available and the application can maintain an acceptable level of end-user experience. Therefore, we can achieve high availability with just 6 instances in this case.
+\end{itemize}
+
+\subsection{Question 40}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item You would like to mount a network file system on Linux instances, where files will be stored and accessed frequently at first, and then infrequently. What solution is the MOST cost-effective?
+	\end{itemize}
+	\item Answer: EFS IA
+	\item Amazon EFS Infrequent Access (EFS IA) is a storage class that provides price/performance that is cost-optimized for files, not accessed every day
+\end{itemize}
+
+\subsection{Question 43}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An HTTP application is deployed on an Auto Scaling Group, is accessible from an Application Load Balancer that provides HTTPS termination, and accesses a PostgreSQL database managed by RDS.
+		\item How should you configure the security groups? (Select three)
+	\end{itemize}
+	\item Answer: The security group of RDS should have an inbound rule from the security group of the EC2 instances in the ASG on port 5432
+	\item Answer: The security group of the EC2 instances should have an inbound rule from the security group of the ALB on port 80
+	\item Answer: The security group of the ALB should have an inbound rule from anywhere on port 443
+\end{itemize}
+
+\subsection{Question 45}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item The engineering team at an e-commerce company is working on cost optimizations for EC2 instances. The team wants to manage the workload using a mix of on-demand and spot instances across multiple instance types. They would like to create an Auto Scaling group with a mix of these instances.
+		\item Which of the following options would allow the engineering team to provision the instances for this use-case?
+	\end{itemize}
+	\item Answer: You can only use a launch template to provision capacity across multiple instance types using both On-Demand Instances and Spot Instances to achieve the desired scale, performance, and cost
+	\item You cannot use a launch configuration to provision capacity across multiple instance types using both On-Demand Instances and Spot Instances. 
+\end{itemize}
+
+\subsection{Question 46}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item You have been hired as a Solutions Architect to advise a company on the various authentication/authorization mechanisms that AWS offers to authorize an API call within the API Gateway. The company would prefer a solution that offers built-in user management.
+		\item Which of the following solutions would you suggest as the best fit for the given use-case?
+	\end{itemize}
+	\item Answer: Use Amazon Cognito User Pools
+	\item A user pool is a user directory in Amazon Cognito. You can leverage Amazon Cognito User Pools to either provide built-in user management or integrate with external identity providers, such as Facebook, Twitter, Google+, and Amazon. 
+\end{itemize}
+
+\subsection{Question 47}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A developer needs to implement a Lambda function in AWS account A that accesses an Amazon S3 bucket in AWS account B.
+		\item As a Solutions Architect, which of the following will you recommend to meet this requirement?
+	\end{itemize}
+	\item Answer: Create an IAM role for the Lambda function that grants access to the S3 bucket. Set the IAM role as the Lambda function's execution role. Make sure that the bucket policy also grants access to the Lambda function's execution role
+	\item If the IAM role that you create for the Lambda function is in the same AWS account as the bucket, then you don't need to grant Amazon S3 permissions on both the IAM role and the bucket policy. Instead, you can grant the permissions on the IAM role and then verify that the bucket policy doesn't explicitly deny access to the Lambda function role. If the IAM role and the bucket are in different accounts, then you need to grant Amazon S3 permissions on both the IAM role and the bucket policy.
+\end{itemize}
+
+\subsection{Question 49}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item You have a team of developers in your company, and you would like to ensure they can quickly experiment with AWS Managed Policies by attaching them to their accounts, but you would like to prevent them from doing an escalation of privileges, by granting themselves the AdministratorAccess managed policy. How should you proceed?
+	\end{itemize}
+	\item Answer: For each developer, define an IAM permission boundary that will restrict the managed policies they can attach to themselves
+	\item AWS supports permissions boundaries for IAM entities (users or roles). A permissions boundary is an advanced feature for using a managed policy to set the maximum permissions that an identity-based policy can grant to an IAM entity. An entity's permissions boundary allows it to perform only the actions that are allowed by both its identity-based policies and its permissions boundaries. Here we have to use an IAM permission boundary. They can only be applied to roles or users, not IAM groups.
+\end{itemize}
+
+\subsection{Question 50}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An application runs big data workloads on EC2 instances. 
+		\item The application needs at least 20 instances to maintain a minimum acceptable performance threshold \item and the application needs 300 instances to handle spikes in the workload. 
+		\item Based on historical workloads processed by the application, it needs 80 instances 80 percent of the time.
+		\item As a solutions architect, which of the following would you recommend as the MOST cost-optimal solution so that it can meet the workload demand in a steady state?
+	\end{itemize}
+	\item Answer: Purchase 80 reserved instances. Provision additional on-demand and spot instances per the workload demand (Use Auto Scaling Group with launch template to provision the mix of on-demand and spot instances)
+	\item As the steady-state workload demand is 80 instances, we can save on costs by purchasing 80 reserved instances.
+\end{itemize}
+
+\subsection{Question 51}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item You are establishing a monitoring solution for desktop systems, that will be sending telemetry data into AWS every 1 minute. 
+		\item Data for each system must be processed in order, independently, and you would like to scale the number of consumers to be possibly equal to the number of desktop systems that are being monitored.
+	\end{itemize}
+	\item Answer: Use an SQS FIFO queue, and make sure the telemetry data is sent with a Group ID attribute representing the value of the Desktop ID
+	\item We, therefore, need to use an SQS FIFO queue. If we don't specify a GroupID, then all the messages are in absolute order, but we can only have 1 consumer at most. To allow for multiple consumers to read data for each Desktop application, and to scale the number of consumers, we should use the "Group ID" attribute. 
+\end{itemize}
+
+\subsection{Question 52}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A systems administrator has created a private hosted zone and associated it with a Virtual Private Cloud (VPC). However, the DNS queries for the private hosted zone remain unresolved.
+		\item As a Solutions Architect, can you identify the Amazon VPC options to be configured in order to get the private hosted zone to work?
+	\end{itemize}
+	\item Answer: Enable DNS hostnames and DNS resolution for private hosted zones
+	\item  DNS hostnames and DNS resolution are required settings for private hosted zones. DNS queries for private hosted zones can be resolved by the Amazon-provided VPC DNS server only. As a result, these options must be enabled for your private hosted zone to work.
+\end{itemize}
+
+\subsection{Question 54}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An engineering team wants to examine the feasibility of the user data feature of Amazon EC2 for an upcoming project
+		\item Which of the following are true about the EC2 user data configuration? (Select two)
+	\end{itemize}
+	\item Answer: By default, scripts entered as user data are executed with root user privileges
+	\item Answer: By default, user data runs only during the boot cycle when you first launch an instance
+\end{itemize}
+
+\subsection{Question 55}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item An IT company is working on client engagement to build a real-time data analytics tool for the Internet of Things (IoT) data. 
+		\item The IoT data is funneled into Kinesis Data Streams which further acts as the source of a delivery stream for Kinesis Firehose. 
+		\item The engineering team has now configured a Kinesis Agent to send IoT data from another set of devices to the same Firehose delivery stream. 
+		\item They noticed that data is not reaching Firehose as expected.
+		\item As a solutions architect, which of the following options would you attribute as the MOST plausible root cause behind this issue?
+	\end{itemize}
+	\item Answer: Kinesis Agent cannot write to a Kinesis Firehose for which the delivery stream source is already set as Kinesis Data
+	\item When a Kinesis data stream is configured as the source of a Firehose delivery stream, Firehose’s PutRecord and PutRecordBatch operations are disabled and Kinesis Agent cannot write to Firehose delivery stream directly. Data needs to be added to the Kinesis data stream through the Kinesis Data Streams PutRecord and PutRecords operations instead.
+\end{itemize}
+
+\subsection{Question 57}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A retail company wants to rollout and test a blue-green deployment for its global application in the next 48 hours. Most of the customers use mobile phones which are prone to DNS caching. The company has only two days left for the annual Thanksgiving sale to commence.
+		\item As a Solutions Architect, which of the following options would you recommend to test the deployment on as many users as possible in the given time frame?
+	\end{itemize}
+	\item Answer: Use AWS Global Accelerator to distribute a portion of traffic to a particular deployment
+	\item AWS Global Accelerator is a network layer service that directs traffic to optimal endpoints over the AWS global network, this improves the availability and performance of your internet applications. 
+\end{itemize}
+
+\subsection{Question 58}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item You would like to store a database password in a secure place, and enable automatic rotation of that password every 90 days. What do you recommend?
+	\end{itemize}
+	\item Answer: Secrets manager
+	\item AWS Secrets Manager helps you protect secrets needed to access your applications, services, and IT resources. 
+\end{itemize}
+
+\subsection{Question 59}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item You would like to use Snowball to move on-premises backups into a long term archival tier on AWS. Which solution provides the MOST cost savings?
+	\end{itemize}
+	\item Answer: Create a Snowball job and target an S3 bucket. Create a lifecycle policy to immediately move data to Glacier Deep Archive
+\end{itemize}
+
+\subsection{Question 60}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A company is developing a healthcare application that cannot afford any downtime for database write operations. The company has hired you as an AWS Certified Solutions Architect Associate to build a solution using Amazon Aurora.
+	\end{itemize}
+	\item Answer: Set up an Aurora multi-master DB cluster
+	\item In a multi-master cluster, all DB instances can perform write operations. There isn't any failover when a writer DB instance becomes unavailable, because another writer DB instance is immediately available to take over the work of the failed instance. 
+\end{itemize}
+
+\subsection{Question 61}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A developer has configured inbound traffic for the relevant ports in both the Security Group of the EC2 instance 
+		\item as well as the Network Access Control List (NACL) of the subnet for the EC2 instance. 
+		\item The developer is, however, unable to connect to the service running on the Amazon EC2 instance.
+		\item As a solutions architect, how will you fix this issue?
+	\end{itemize}
+	\item Answer: Security Groups are stateful, so allowing inbound traffic to the necessary ports enables the connection. Network ACLs are stateless, so you must allow both inbound and outbound traffic
+	\item To enable the connection to a service running on an instance, the associated network ACL must allow both inbound traffic on the port that the service is listening on as well as allow outbound traffic from ephemeral ports. When a client connects to a server, a random port from the ephemeral port range (1024-65535) becomes the client's source port.
+	\item The designated ephemeral port then becomes the destination port for return traffic from the service, so outbound traffic from the ephemeral port must be allowed in the network ACL.
+\end{itemize}
+
+\subsection{Question 63}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A startup has just developed a video backup service hosted on a fleet of EC2 instances. 
+		\item The EC2 instances are behind an Application Load Balancer and the instances are using EBS volumes for storage. 
+		\item The service provides authenticated users the ability to upload videos that are then saved on the EBS volume attached to a given instance. 
+		\item On the first day of the beta launch, users start complaining that they can see only some of the videos in their uploaded videos backup. 
+		\item Every time the users log into the website, they claim to see a different subset of their uploaded videos.
+		\item Which of the following is the MOST optimal solution to make sure that users can view all the uploaded videos? (Select two)
+	\end{itemize}
+	\item Answer: Write a one time job to copy the videos from all EBS volumes to S3 and then modify the application to use Amazon S3 standard for storing the videos
+	\item Answer: Mount EFS on all EC2 instances. Write a one time job to copy the videos from all EBS volumes to EFS. Modify the application to use EFS for storing the videos
+\end{itemize}
+
+\subsection{Question 65}
+\begin{itemize}
+	\item Question
+	\begin{itemize}
+		\item A silicon valley based startup has a two-tier architecture using EC2 instances for its flagship application. The web servers (listening on port 443), which have been assigned security group A, are in public subnets across two Availability Zones and the MSSQL based database instances (listening on port 1433), which have been assigned security group B, are in two private subnets across two Availability Zones. The DevOps team wants to review the security configurations of the application architecture.
+		\item As a solutions architect, which of the following options would you select as the MOST secure configuration? (Select two)
+	\end{itemize}
+	\item Answer: For security group A: Add an inbound rule that allows traffic from all sources on port 443. Add an outbound rule with the destination as security group B on port 1433
+	\item Answer: For security group B: Add an inbound rule that allows traffic only from security group A on port 1433
+\end{itemize}
+
+\section{Other things to keep in mind}
+\begin{itemize}
+	\item AWS Transit Gateway is a service that enables customers to connect their Amazon Virtual Private Clouds (VPCs) and their on-premises networks to a single gateway.
+	\item AWS OpsWorks is a configuration management service that provides managed instances of Chef and Puppet. 
+	\item There are data transfer charges for replicating data across AWS Regions
+	\item Migrate account from Org A to B: Remove the member account from the old organization. Send an invite to the member account from the new Organization. Accept the invite to the new organization from the member account
+	\item the company wants to manage the encryption keys via its custom application and let S3 manage the encryption, therefore you must use Server-Side Encryption with Customer-Provided Keys (SSE-C).
+	\item Dedicated Instances are Amazon EC2 instances that run in a virtual private cloud (VPC) on hardware that's dedicated to a single customer.
+	\item Which option below helps change this default behavior to ensure that the EBS volume persists even after the instance terminates: Set the DeleteOnTermination attribute to false
+	\item EFS is POSIX compliant
+	\item Amazon Aurora Global Database is designed for globally distributed applications, allowing a single Amazon Aurora database to span multiple AWS regions. 
+	\item Encrypt RDS DBs: Take a snapshot of the database, copy it as an encrypted snapshot, and restore a database from the encrypted snapshot. Terminate the previous database
+	\item If the master database is encrypted, the read replicas are encrypted
+	\item Separate read requests from write requests (Aurora): Set up a read replica and modify the application to use the appropriate endpoint
+\end{itemize}
+
+\end{document}
