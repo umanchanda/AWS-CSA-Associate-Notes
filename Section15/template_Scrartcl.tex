@@ -1,0 +1,122 @@
+\documentclass[]{scrartcl}
+
+%opening
+\title{CloudFront and AWS Global Accelerator}
+\author{Uday Manchanda}
+
+\begin{document}
+
+\maketitle
+
+\section{CloudFront}
+
+\begin{itemize}
+	\item CDN (Content Delivery Network)
+	\item Improves read performance, content is cached at the edge
+	\item 216 edge locations
+	\item DDos Protection, integration with AWS Shield, AWS WAF
+	\item Expose external HTTPS and can talk to internal HTTPS backends
+	\item Origins
+	\begin{itemize}
+		\item S3 bucket - for distributing files and caching them at the edge
+		\item enhanced security with CF Origin Access Identity (OAI) - allows communication from CF and nowhere else
+		\item Custom origin (HTTP) - ALB, EC2, S3 website, any HTTP backend
+	\end{itemize}
+	\item Edge location are connected to the origin we defined
+	\item Client access CF distribution, client sends HTTP request to CF, edge location forwards request to your origin
+	\item Edge location caches the request
+\end{itemize}
+
+\subsection{CF - S3 as an origin}
+\begin{itemize}
+	\item edge location will fetch data from s3 location
+	\item edge location will use an OAI to access s3 bucket, which is an IAM role for your CF origin
+\end{itemize}
+
+\subsection{ALB or EC2 as an origin}
+\begin{itemize}
+	\item Ec2 instances must be public
+	\item ege location will access ec2 instance, must allow public IP of edge location
+	\item for alb it also must be public
+	\item alb must allow public ip of edge location, alb then allows SG of of LB
+\end{itemize}
+
+\subsection{Geo Restriction}
+\begin{itemize}
+	\item you can restrict who can access your distribution
+	\item via: whitelist, blacklist
+	\item Country is determined via third party geo ip database
+	\item CF vs s3 CRR
+	\begin{itemize}
+		\item Cf - great for static content that must be available everywhere
+		\item s3 crr - great for dynamic content that needs to be available at low-latency in a few regions
+	\end{itemize}
+\end{itemize}
+
+\subsection{CloudFront Signed URL/Cookies}
+\begin{itemize}
+	\item lets say you want to distribute paid shared content to premium users all over the world
+	\item attach a policy with: url expiration, IP ranges, trusted signers
+	\item Signed URL = access to individual files (one signed URL per file)
+	\item Signed cookies = access to multiple files
+	\item CF signed url vs S3 signed URL
+	\begin{itemize}
+		\item CF - allows access to a path, no matter the origin, account wide, leverge all caching features
+		\item s3 - issue a request as the person who pre signed the URL, uses IAM key of the signing IAM principal, limited lifetime
+	\end{itemize}
+\end{itemize}
+
+\subsection{Advanced Concepts}
+\begin{itemize}
+	\item the more data transferred out of CF the lower the cost
+	\item ccan reduce the number of edge locations for cost reduction
+	\item three price classes
+	\begin{itemize}
+		\item Price class all
+		\item Price class 200
+		\item Price class 100
+	\end{itemize}
+	\item Multiple Origin - route to different kinds of origins based on the content type based on path pattern
+	\item Origin Groups - increase HA and do failover. Have one primary and one secondary
+	\item can set up replication if primary and secondary buckets are in different regions
+	\item Field level encryption - protect sensitive information thru application stack
+	\item sensitive info encrypted at the edge location close to the user
+	\item Uses assyemtric encryption
+\end{itemize}
+
+\section{Global Accelerator}
+\begin{itemize}
+	\item The problem
+	\begin{itemize}
+		\item Deployed a global application and have global users who want to access it
+		\item they go over the public internet which can add a lot of latency due to hops
+		\item we wish to go as fast as possible thru aws newtork to minimize latency
+	\end{itemize}
+	\item uses anycast IP to send traffic directly to edge locations, edge locations send traffic to your application
+	\item leverages the aws internal network to route your application
+	\item works with: elastic IP, ec2, ALb, NLB, public or private
+	\item Consistent Performance - intelligent routing, no issues with caching, internal network
+	\item Health checks
+	\item only 2 ips need to be whitelisted and DDoS protection
+\end{itemize}
+
+\subsection{Global Accelerator vs CloudFront}
+
+\begin{itemize}
+	\item both use the aws global network and its edge locations around the world
+	\item both integrate with aws shield for DDoS protection
+	\item CloudFront
+	\begin{itemize}
+		\item improves performance for both cacheable content and dynamic content
+		\item content is served at the edge
+	\end{itemize}
+	\item Global Accelerator
+	\begin{itemize}
+		\item improves performance for a wide range of applications over TCP or UDP
+		\item Proxying packets at the edge to applications running in one or more AWS regions
+		\item Good fit for non HTTP use cases
+		\item or for HTTP use cases that require static IP addresses or fast failover
+	\end{itemize}
+\end{itemize}
+
+\end{document}
